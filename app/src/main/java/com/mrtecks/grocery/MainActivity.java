@@ -2,8 +2,10 @@ package com.mrtecks.grocery;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -13,6 +15,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.ContentProvider;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -59,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     List<Banners> list1;
     List<Member> list2;
     List<Cat> list3;
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,18 @@ public class MainActivity extends AppCompatActivity {
         readMore = findViewById(R.id.textView7);
         progress = findViewById(R.id.progress);
 
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        drawer = findViewById(R.id.drawer);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open , R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        toolbar.setTitle("Delivery Location");
+        toolbar.setSubtitle("Agartala, India");
 
         adapter2 = new BestAdapter(this , list);
         adapter3 = new BestAdapter(this , list);
@@ -110,6 +127,26 @@ public class MainActivity extends AppCompatActivity {
         categories.setAdapter(adapter6);
         categories.setLayoutManager(manager5);
 
+
+
+
+
+        category.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(MainActivity.this , Category.class);
+                startActivity(intent);
+
+            }
+        });
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         progress.setVisibility(View.VISIBLE);
 
         Bean b = (Bean) getApplicationContext();
@@ -153,11 +190,6 @@ public class MainActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
             }
         });
-
-
-
-
-
     }
 
     class BannerAdapter extends FragmentStatePagerAdapter
@@ -240,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-            Best item = list.get(position);
+            final Best item = list.get(position);
 
             DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).resetViewBeforeLoading(false).build();
             ImageLoader loader = ImageLoader.getInstance();
@@ -268,6 +300,18 @@ public class MainActivity extends AppCompatActivity {
 
 
             holder.title.setText(item.getName());
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent intent = new Intent(context , SingleProduct.class);
+                    intent.putExtra("id" , item.getId());
+                    intent.putExtra("title" , item.getName());
+                    context.startActivity(intent);
+
+                }
+            });
 
         }
 
@@ -444,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-            Cat item = list.get(position);
+            final Cat item = list.get(position);
 
 
             DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).resetViewBeforeLoading(false).build();
@@ -455,7 +499,17 @@ public class MainActivity extends AppCompatActivity {
             holder.title.setText(item.getName());
             holder.desc.setText(item.getDescription());
 
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
+                    Intent intent = new Intent(context , SubCat.class);
+                    intent.putExtra("id" , item.getId());
+                    intent.putExtra("title" , item.getName());
+                    context.startActivity(intent);
+
+                }
+            });
 
         }
 
