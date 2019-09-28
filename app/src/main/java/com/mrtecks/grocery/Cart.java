@@ -166,7 +166,7 @@ public class Cart extends AppCompatActivity {
         AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
 
         Log.d("userid", SharePreferenceUtils.getInstance().getString("userId"));
-        Log.d("client", client);
+
 
         Call<cartBean> call = cr.getCart(SharePreferenceUtils.getInstance().getString("userId"));
         call.enqueue(new Callback<cartBean>() {
@@ -404,6 +404,8 @@ public class Cart extends AppCompatActivity {
             });
 
 
+            viewHolder.price.setText("\u20B9 " + item.getPrice());
+
 
             DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).resetViewBeforeLoading(false).build();
             ImageLoader loader = ImageLoader.getInstance();
@@ -422,7 +424,7 @@ public class Cart extends AppCompatActivity {
             ImageButton delete;
 
             Button add, remove;
-            TextView quantity , title , brand;
+            TextView quantity , title , brand , price;
 
 
             ViewHolder(@NonNull View itemView) {
@@ -439,6 +441,7 @@ public class Cart extends AppCompatActivity {
                 quantity = itemView.findViewById(R.id.display);
                 title = itemView.findViewById(R.id.textView20);
                 brand = itemView.findViewById(R.id.textView21);
+                price = itemView.findViewById(R.id.textView22);
 
                 //buy.setSideTapEnabled(true);
 
