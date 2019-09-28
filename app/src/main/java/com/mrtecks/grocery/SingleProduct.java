@@ -3,20 +3,30 @@ package com.mrtecks.grocery;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mrtecks.grocery.seingleProductPOJO.Data;
 import com.mrtecks.grocery.seingleProductPOJO.singleProductBean;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.util.concurrent.TimeUnit;
+
+import nl.dionsegijn.steppertouch.StepperTouch;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,6 +45,8 @@ public class SingleProduct extends AppCompatActivity {
     ProgressBar progress;
 
     String id , name;
+
+    String pid , nv1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +86,106 @@ public class SingleProduct extends AppCompatActivity {
         });
 
 
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                if (pid.length() > 0)
+                {
+                    String uid = SharePreferenceUtils.getInstance().getString("userId");
+
+                    if (uid.length() > 0)
+                    {
+
+                        final Dialog dialog = new Dialog(SingleProduct.this);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setCancelable(true);
+                        dialog.setContentView(R.layout.add_cart_dialog);
+                        dialog.show();
+
+                        final StepperTouch stepperTouch  = dialog.findViewById(R.id.stepperTouch);
+                        Button add = dialog.findViewById(R.id.button8);
+                        final ProgressBar progressBar = dialog.findViewById(R.id.progressBar2);
+
+
+
+                        stepperTouch.setMinValue(1);
+                        stepperTouch.setMaxValue(99);
+                        stepperTouch.setSideTapEnabled(true);
+                        stepperTouch.setCount(1);
+
+                        add.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                progressBar.setVisibility(View.VISIBLE);
+
+                                Bean b = (Bean) getApplicationContext();
+
+
+                                HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+                                logging.level(HttpLoggingInterceptor.Level.HEADERS);
+                                logging.level(HttpLoggingInterceptor.Level.BODY);
+
+                                OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
+
+                                Retrofit retrofit = new Retrofit.Builder()
+                                        .baseUrl(b.baseurl)
+                                        .client(client)
+                                        .addConverterFactory(ScalarsConverterFactory.create())
+                                        .addConverterFactory(GsonConverterFactory.create())
+                                        .build();
+                                AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+                                Log.d("userid" , SharePreferenceUtils.getInstance().getString("userid"));
+                                Log.d("pid" , pid);
+                                Log.d("quantity" , String.valueOf(stepperTouch.getCount()));
+                                Log.d("price" , nv1);
+
+                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userid") , pid , String.valueOf(stepperTouch.getCount()), nv1);
+
+                                call.enqueue(new Callback<singleProductBean>() {
+                                    @Override
+                                    public void onResponse(Call<singleProductBean> call, Response<singleProductBean> response) {
+
+                                        if (response.body().getStatus().equals("1"))
+                                        {
+                                            //loadCart();
+                                            dialog.dismiss();
+                                        }
+
+                                        Toast.makeText(SingleProduct.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+
+                                        progressBar.setVisibility(View.GONE);
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<singleProductBean> call, Throwable t) {
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                });
+
+
+                            }
+                        });
+
+                    }
+                    else
+                    {
+                        Toast.makeText(SingleProduct.this, "Please login to continue", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(SingleProduct.this , Login.class);
+                        startActivity(intent);
+
+                    }
+                }
+
+
+
+            }
+        });
+
 
     }
 
@@ -85,8 +197,15 @@ public class SingleProduct extends AppCompatActivity {
 
         Bean b = (Bean) getApplicationContext();
 
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.level(HttpLoggingInterceptor.Level.HEADERS);
+        logging.level(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(b.baseurl)
+                .client(client)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -103,6 +222,8 @@ public class SingleProduct extends AppCompatActivity {
                 {
                     Data item = response.body().getData();
 
+                    pid = item.getId();
+
                     DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).resetViewBeforeLoading(false).build();
                     ImageLoader loader = ImageLoader.getInstance();
                     loader.displayImage(item.getImage() , image , options);
@@ -117,12 +238,16 @@ public class SingleProduct extends AppCompatActivity {
 
                         float nv = pri - dv;
 
+                        nv1 = String.valueOf(nv);
+
                         discount.setVisibility(View.VISIBLE);
                         discount.setText(item.getDiscount() + "% OFF");
                         price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(nv) + " </b></font><strike>\u20B9 " + item.getPrice() + "</strike>"));
                     }
                     else
                     {
+
+                        nv1 = item.getPrice();
                         discount.setVisibility(View.GONE);
                         price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(item.getPrice()) + " </b></font>"));
                     }

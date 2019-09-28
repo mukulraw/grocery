@@ -1,15 +1,20 @@
 package com.mrtecks.grocery;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,12 +24,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mrtecks.grocery.productsPOJO.Datum;
 import com.mrtecks.grocery.productsPOJO.productsBean;
+import com.mrtecks.grocery.seingleProductPOJO.singleProductBean;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import nl.dionsegijn.steppertouch.StepperTouch;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -56,7 +66,7 @@ public class productList extends Fragment {
         grid = view.findViewById(R.id.grid);
         progress = view.findViewById(R.id.progress);
 
-        adapter = new BestAdapter(getContext() , list);
+        adapter = new BestAdapter(getActivity() , list);
         GridLayoutManager manager = new GridLayoutManager(getContext() , 2);
 
         grid.setAdapter(adapter);
@@ -77,8 +87,15 @@ public class productList extends Fragment {
 
         Bean b = (Bean) getActivity().getApplicationContext();
 
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.level(HttpLoggingInterceptor.Level.HEADERS);
+        logging.level(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(b.baseurl)
+                .client(client)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -144,7 +161,7 @@ public class productList extends Fragment {
             loader.displayImage(item.getImage() , holder.image , options);
 
             float dis = Float.parseFloat(item.getDiscount());
-
+            String nv1 = null;
             if (dis > 0)
             {
 
@@ -153,12 +170,15 @@ public class productList extends Fragment {
 
                 float nv = pri - dv;
 
+                nv1 = String.valueOf(nv);
+
                 holder.discount.setVisibility(View.VISIBLE);
                 holder.discount.setText(item.getDiscount() + "% OFF");
                 holder.price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(nv) + " </b></font><strike>\u20B9 " + item.getPrice() + "</strike>"));
             }
             else
             {
+                nv1 = item.getPrice();
                 holder.discount.setVisibility(View.GONE);
                 holder.price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(item.getPrice()) + " </b></font>"));
             }
@@ -178,6 +198,101 @@ public class productList extends Fragment {
                 }
             });
 
+            final String finalNv = nv1;
+            holder.add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    String uid = SharePreferenceUtils.getInstance().getString("userId");
+
+                    if (uid.length() > 0)
+                    {
+
+                        final Dialog dialog = new Dialog(context);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setCancelable(true);
+                        dialog.setContentView(R.layout.add_cart_dialog);
+                        dialog.show();
+
+                        final StepperTouch stepperTouch  = dialog.findViewById(R.id.stepperTouch);
+                        Button add = dialog.findViewById(R.id.button8);
+                        final ProgressBar progressBar = dialog.findViewById(R.id.progressBar2);
+
+
+
+                        stepperTouch.setMinValue(1);
+                        stepperTouch.setMaxValue(99);
+                        stepperTouch.setSideTapEnabled(true);
+                        stepperTouch.setCount(1);
+
+                        add.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                progressBar.setVisibility(View.VISIBLE);
+
+                                Bean b = (Bean) context.getApplicationContext();
+
+
+                                HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+                                logging.level(HttpLoggingInterceptor.Level.HEADERS);
+                                logging.level(HttpLoggingInterceptor.Level.BODY);
+
+                                OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
+
+                                Retrofit retrofit = new Retrofit.Builder()
+                                        .baseUrl(b.baseurl)
+                                        .client(client)
+                                        .addConverterFactory(ScalarsConverterFactory.create())
+                                        .addConverterFactory(GsonConverterFactory.create())
+                                        .build();
+                                AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+                                Log.d("userid" , SharePreferenceUtils.getInstance().getString("userid"));
+                                Log.d("pid" , item.getId());
+                                Log.d("quantity" , String.valueOf(stepperTouch.getCount()));
+                                Log.d("price" , finalNv);
+
+                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userid") , item.getId() , String.valueOf(stepperTouch.getCount()), finalNv);
+
+                                call.enqueue(new Callback<singleProductBean>() {
+                                    @Override
+                                    public void onResponse(Call<singleProductBean> call, Response<singleProductBean> response) {
+
+                                        if (response.body().getStatus().equals("1"))
+                                        {
+                                            //loadCart();
+                                            dialog.dismiss();
+                                        }
+
+                                        Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+
+                                        progressBar.setVisibility(View.GONE);
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<singleProductBean> call, Throwable t) {
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                });
+
+
+                            }
+                        });
+
+                    }
+                    else
+                    {
+                        Toast.makeText(context, "Please login to continue", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(context , Login.class);
+                        context.startActivity(intent);
+
+                    }
+
+                }
+            });
+
         }
 
         @Override
@@ -190,7 +305,7 @@ public class productList extends Fragment {
 
             ImageView image;
             TextView price , title , discount;
-
+            Button add;
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
@@ -198,7 +313,7 @@ public class productList extends Fragment {
                 price = itemView.findViewById(R.id.textView11);
                 title = itemView.findViewById(R.id.textView12);
                 discount = itemView.findViewById(R.id.textView10);
-
+                add = itemView.findViewById(R.id.button5);
 
             }
         }

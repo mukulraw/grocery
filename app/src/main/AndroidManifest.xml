@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".SingleProduct"></activity>
+        <activity android:name=".Cart"></activity>
+        <activity android:name=".SingleProduct" />
         <activity android:name=".Products" />
         <activity android:name=".SubCat" />
         <activity android:name=".Category" />

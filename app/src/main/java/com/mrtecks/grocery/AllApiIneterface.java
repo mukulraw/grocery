@@ -1,5 +1,6 @@
 package com.mrtecks.grocery;
 
+import com.mrtecks.grocery.cartPOJO.cartBean;
 import com.mrtecks.grocery.homePOJO.homeBean;
 import com.mrtecks.grocery.productsPOJO.productsBean;
 import com.mrtecks.grocery.seingleProductPOJO.singleProductBean;
@@ -41,5 +42,47 @@ public interface AllApiIneterface {
     @POST("grocery/api/getProductById.php")
     Call<singleProductBean> getProductById(
             @Part("id") String cat
+    );
+
+    @Multipart
+    @POST("grocery/api/login.php")
+    Call<loginBean> login(
+            @Part("phone") String phone,
+            @Part("token") String token
+    );
+
+    @Multipart
+    @POST("grocery/api/addCart.php")
+    Call<singleProductBean> addCart(
+            @Part("user_id") String user_id,
+            @Part("product_id") String product_id,
+            @Part("quantity") String quantity,
+            @Part("unit_price") String unit_price
+    );
+
+    @Multipart
+    @POST("grocery/api/updateCart.php")
+    Call<singleProductBean> updateCart(
+            @Part("id") String id,
+            @Part("quantity") String quantity,
+            @Part("unit_price") String unit_price
+    );
+
+    @Multipart
+    @POST("grocery/api/deleteCart.php")
+    Call<singleProductBean> deleteCart(
+            @Part("id") String id
+    );
+
+    @Multipart
+    @POST("grocery/api/clearCart.php")
+    Call<singleProductBean> clearCart(
+            @Part("user_id") String user_id
+    );
+
+    @Multipart
+    @POST("grocery/api/getCart.php")
+    Call<cartBean> getCart(
+            @Part("user_id") String user_id
     );
 }
