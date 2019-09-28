@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     List<Cat> list3;
     DrawerLayout drawer;
 
-    TextView login , logout , cart;
+    TextView login , logout , cart , orders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         login = findViewById(R.id.textView3);
         logout = findViewById(R.id.logout);
         cart = findViewById(R.id.cart);
+        orders = findViewById(R.id.orders);
 
         setSupportActionBar(toolbar);
 
@@ -205,9 +207,30 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
                 }
 
+                drawer.closeDrawer(GravityCompat.START);
+
             }
         });
 
+
+        orders.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (uid.length() > 0)
+                {
+                    Intent intent = new Intent(MainActivity.this , Orders.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
+                }
+
+                drawer.closeDrawer(GravityCompat.START);
+
+            }
+        });
 
     }
 

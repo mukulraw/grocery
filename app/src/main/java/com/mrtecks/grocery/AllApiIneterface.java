@@ -1,7 +1,9 @@
 package com.mrtecks.grocery;
 
 import com.mrtecks.grocery.cartPOJO.cartBean;
+import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
 import com.mrtecks.grocery.homePOJO.homeBean;
+import com.mrtecks.grocery.ordersPOJO.ordersBean;
 import com.mrtecks.grocery.productsPOJO.productsBean;
 import com.mrtecks.grocery.seingleProductPOJO.singleProductBean;
 import com.mrtecks.grocery.subCat1POJO.subCat1Bean;
@@ -84,5 +86,22 @@ public interface AllApiIneterface {
     @POST("grocery/api/getCart.php")
     Call<cartBean> getCart(
             @Part("user_id") String user_id
+    );
+
+    @Multipart
+    @POST("grocery/api/getOrders.php")
+    Call<ordersBean> getOrders(
+            @Part("user_id") String user_id
+    );
+
+    @Multipart
+    @POST("grocery/api/buyVouchers.php")
+    Call<checkoutBean> buyVouchers(
+            @Part("user_id") String user_id,
+            @Part("amount") String amount,
+            @Part("txn") String txn,
+            @Part("name") String name,
+            @Part("address") String address,
+            @Part("pay_mode") String pay_mode
     );
 }

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,7 +47,7 @@ public class Cart extends AppCompatActivity {
     String base;
     TextView btotal, bproceed, clear;
 
-    int amm = 0;
+    float amm = 0;
 
     View bottom;
 
@@ -140,6 +142,18 @@ public class Cart extends AppCompatActivity {
             }
         });
 
+        bproceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Intent intent = new Intent(Cart.this , Checkout.class);
+                intent.putExtra("amount" , String.valueOf(amm));
+                startActivity(intent);
+
+            }
+        });
+
     }
 
     @Override
@@ -178,7 +192,7 @@ public class Cart extends AppCompatActivity {
 
                     adapter.setgrid(response.body().getData());
 
-                    amm = Integer.parseInt(response.body().getTotal());
+                    amm = Float.parseFloat(response.body().getTotal());
 
 
                     btotal.setText("Total: Rs. " + response.body().getTotal());
@@ -187,6 +201,7 @@ public class Cart extends AppCompatActivity {
                 } else {
                     adapter.setgrid(response.body().getData());
                     bottom.setVisibility(View.GONE);
+                    Toast.makeText(Cart.this, "Cart is empty", Toast.LENGTH_SHORT).show();
                     finish();
                 }
 
