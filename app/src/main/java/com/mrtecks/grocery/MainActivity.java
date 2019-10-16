@@ -114,7 +114,16 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
 
         toolbar.setTitle("Delivery Location");
-        toolbar.setSubtitle("Agartala, India");
+        toolbar.setSubtitle("Agartala");
+
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Toast.makeText(MainActivity.this, "clicked", Toast.LENGTH_SHORT).show();
+
+            }
+        });
 
         adapter2 = new BestAdapter(this , list);
         adapter3 = new BestAdapter(this , list);

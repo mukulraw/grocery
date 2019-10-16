@@ -30,7 +30,66 @@
             app:subtitle="Agartala, India"
             app:subtitleTextColor="#fff"
             app:title="Delivery Location"
-            app:titleTextColor="#fff" />
+            app:titleTextColor="#fff" >
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#00000000"
+
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginEnd="18dp"
+                        android:layout_gravity="center_vertical">
+
+                        <ImageButton
+                            android:id="@+id/imageButton3"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:background="@drawable/ic_shopping_cart"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:background="@drawable/accent_round"
+                            android:padding="3dp"
+                            android:text="99"
+                            android:textColor="#ffffff"
+                            android:textSize="8sp"
+                            app:layout_constraintEnd_toEndOf="@+id/imageButton3"
+                            app:layout_constraintBottom_toTopOf="@+id/imageButton3"
+                            app:layout_constraintStart_toEndOf="@+id/imageButton3"
+                            app:layout_constraintTop_toTopOf="@+id/imageButton3" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+
+        </androidx.appcompat.widget.Toolbar>
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
