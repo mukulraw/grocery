@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     List<Cat> list3;
     DrawerLayout drawer;
 
-    TextView login , logout , cart , orders;
+    TextView login , logout , cart , orders , title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         logout = findViewById(R.id.logout);
         cart = findViewById(R.id.cart);
         orders = findViewById(R.id.orders);
+        title = findViewById(R.id.title);
 
         setSupportActionBar(toolbar);
 
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("Delivery Location");
         toolbar.setSubtitle("Agartala");
 
-        toolbar.setOnClickListener(new View.OnClickListener() {
+        title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
