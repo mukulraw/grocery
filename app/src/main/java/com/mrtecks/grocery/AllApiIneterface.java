@@ -3,6 +3,7 @@ package com.mrtecks.grocery;
 import com.mrtecks.grocery.cartPOJO.cartBean;
 import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
 import com.mrtecks.grocery.homePOJO.homeBean;
+import com.mrtecks.grocery.orderDetailsPOJO.orderDetailsBean;
 import com.mrtecks.grocery.ordersPOJO.ordersBean;
 import com.mrtecks.grocery.productsPOJO.productsBean;
 import com.mrtecks.grocery.searchPOJO.searchBean;
@@ -94,6 +95,12 @@ public interface AllApiIneterface {
     @POST("grocery/api/clearCart.php")
     Call<singleProductBean> clearCart(
             @Part("user_id") String user_id
+    );
+
+    @Multipart
+    @POST("grocery/api/getOrderDetails.php")
+    Call<orderDetailsBean> getOrderDetails(
+            @Part("order_id") String order_id
     );
 
     @Multipart

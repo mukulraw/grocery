@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -172,6 +173,18 @@ public class Orders extends AppCompatActivity {
             viewHolder.pay.setText(item.getPay_mode());
             viewHolder.slot.setText(item.getSlot());
             viewHolder.amount.setText("\u20B9 " + item.getAmount());
+
+
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent intent = new Intent(context , OrderDetails.class);
+                    intent.putExtra("oid" , item.getId());
+                    startActivity(intent);
+
+                }
+            });
 
 
         }
