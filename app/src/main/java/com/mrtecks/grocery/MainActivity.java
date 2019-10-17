@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ import android.widget.Toast;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.mrtecks.grocery.cartPOJO.cartBean;
 import com.mrtecks.grocery.homePOJO.Banners;
 import com.mrtecks.grocery.homePOJO.Best;
 import com.mrtecks.grocery.homePOJO.Cat;
@@ -75,7 +78,9 @@ public class MainActivity extends AppCompatActivity {
     List<Cat> list3;
     DrawerLayout drawer;
 
-    TextView login , logout , cart , orders , title;
+    TextView login , logout , cart , orders , title , count , location;
+
+    ImageButton cart1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
         cart = findViewById(R.id.cart);
         orders = findViewById(R.id.orders);
         title = findViewById(R.id.title);
+        cart1 = findViewById(R.id.imageButton3);
+        count = findViewById(R.id.count);
+        location = findViewById(R.id.home);
 
         setSupportActionBar(toolbar);
 
@@ -114,14 +122,82 @@ public class MainActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        toolbar.setTitle("Delivery Location");
-        toolbar.setSubtitle("Agartala");
+
+        final String loc = SharePreferenceUtils.getInstance().getString("location");
+
+        if (loc.length() > 0)
+        {
+            title.setText(loc);
+            location.setText(loc);
+        }
+        else
+        {
+            title.setText("Agartala");
+            location.setText("Agartala");
+            SharePreferenceUtils.getInstance().saveString("location" , "Agartala");
+        }
+
 
         title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(MainActivity.this, "clicked", Toast.LENGTH_SHORT).show();
+
+
+                Dialog dialog = new Dialog(MainActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setCancelable(true);
+                dialog.setContentView(R.layout.location_dialog);
+                dialog.show();
+
+                RecyclerView grid = dialog.findViewById(R.id.grid);
+                List<String> locs = new ArrayList<>();
+
+                GridLayoutManager manager = new GridLayoutManager(MainActivity.this , 1);
+
+                locs.add("Agartala");
+                locs.add("Udaipur");
+                locs.add("Silchar");
+                locs.add("Guwahati");
+                locs.add("Kolkata");
+
+                LocationAdapter adapter = new LocationAdapter(MainActivity.this , locs , dialog);
+
+                grid.setAdapter(adapter);
+                grid.setLayoutManager(manager);
+
+            }
+        });
+
+        location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                drawer.closeDrawer(GravityCompat.START);
+
+
+                Dialog dialog = new Dialog(MainActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setCancelable(true);
+                dialog.setContentView(R.layout.location_dialog);
+                dialog.show();
+
+                RecyclerView grid = dialog.findViewById(R.id.grid);
+                List<String> locs = new ArrayList<>();
+
+                GridLayoutManager manager = new GridLayoutManager(MainActivity.this , 1);
+
+                locs.add("Agartala");
+                locs.add("Udaipur");
+                locs.add("Silchar");
+                locs.add("Guwahati");
+                locs.add("Kolkata");
+
+                LocationAdapter adapter = new LocationAdapter(MainActivity.this , locs , dialog);
+
+                grid.setAdapter(adapter);
+                grid.setLayoutManager(manager);
 
             }
         });
@@ -162,6 +238,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Intent intent = new Intent(MainActivity.this , Category.class);
+                startActivity(intent);
+
+            }
+        });
+
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(MainActivity.this , Search.class);
                 startActivity(intent);
 
             }
@@ -222,6 +308,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        cart1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (uid.length() > 0)
+                {
+                    Intent intent = new Intent(MainActivity.this , Cart.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
+                }
+
+                drawer.closeDrawer(GravityCompat.START);
+
+            }
+        });
 
         orders.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -297,6 +401,67 @@ public class MainActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
             }
         });
+
+
+loadCart();
+
+
+    }
+
+    void loadCart()
+    {
+        String uid = SharePreferenceUtils.getInstance().getString("userId");
+
+        if (uid.length() > 0)
+        {
+            Bean b = (Bean) getApplicationContext();
+
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.level(HttpLoggingInterceptor.Level.HEADERS);
+            logging.level(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(b.baseurl)
+                    .client(client)
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+            Call<cartBean> call2 = cr.getCart(SharePreferenceUtils.getInstance().getString("userId"));
+            call2.enqueue(new Callback<cartBean>() {
+                @Override
+                public void onResponse(Call<cartBean> call, Response<cartBean> response) {
+
+                    if (response.body().getData().size() > 0) {
+
+
+                        count.setText(String.valueOf(response.body().getData().size()));
+
+
+                    } else {
+
+                        count.setText("0");
+
+                    }
+
+                    progress.setVisibility(View.GONE);
+
+                }
+
+                @Override
+                public void onFailure(Call<cartBean> call, Throwable t) {
+                    progress.setVisibility(View.GONE);
+                }
+            });
+        }
+        else
+        {
+            count.setText("0");
+        }
     }
 
     class BannerAdapter extends FragmentStatePagerAdapter
@@ -490,6 +655,7 @@ public class MainActivity extends AppCompatActivity {
                                         {
                                             //loadCart();
                                             dialog.dismiss();
+                                            loadCart();
                                         }
 
                                         Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
@@ -746,5 +912,75 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+
+    class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder>
+    {
+
+        Context context;
+        List<String> list = new ArrayList<>();
+        Dialog dialog;
+
+        public LocationAdapter(Context context , List<String> list , Dialog dialog)
+        {
+            this.context = context;
+            this.list = list;
+            this.dialog = dialog;
+        }
+
+
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService(LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.search_list_model , parent , false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+            final String item = list.get(position);
+
+
+            holder.title.setText(item);
+
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    SharePreferenceUtils.getInstance().saveString("location" , item);
+                    title.setText(item);
+                    location.setText(item);
+                    dialog.dismiss();
+
+                }
+            });
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder
+        {
+
+            TextView title;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+
+                title = itemView.findViewById(R.id.textView37);
+
+
+            }
+        }
+    }
+
 
 }

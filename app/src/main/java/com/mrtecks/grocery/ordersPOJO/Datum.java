@@ -25,6 +25,12 @@ public class Datum {
     @SerializedName("created")
     @Expose
     private String created;
+    @SerializedName("pay_mode")
+    @Expose
+    private String pay_mode;
+    @SerializedName("slot")
+    @Expose
+    private String slot;
 
     public String getId() {
         return id;
@@ -80,5 +86,21 @@ public class Datum {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    public String getPay_mode() {
+        return pay_mode;
+    }
+
+    public String getSlot() {
+        return slot;
+    }
+
+    public void setPay_mode(String pay_mode) {
+        this.pay_mode = pay_mode;
+    }
+
+    public void setSlot(String slot) {
+        this.slot = slot;
     }
 }

@@ -27,9 +27,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:subtitle="Agartala, India"
             app:subtitleTextColor="#fff"
-            app:title="Delivery Location"
             app:titleTextColor="#fff" >
 
 
@@ -76,13 +74,15 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
                             android:layout_alignParentStart="true"
+                            android:id="@+id/count"
                             android:layout_alignParentTop="true"
                             android:background="@drawable/accent_round"
                             android:padding="3dp"
-                            android:text="99"
+                            android:gravity="center"
+                            android:text="0"
                             android:textColor="#ffffff"
                             android:textSize="8sp"
                             app:layout_constraintEnd_toEndOf="@+id/imageButton3"

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -24,31 +23,21 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class Login extends AppCompatActivity {
+public class OTP extends AppCompatActivity {
 
     EditText phone;
     Button login;
     ProgressBar progress;
-    ImageButton back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_otp);
 
         phone = findViewById(R.id.editText);
         login = findViewById(R.id.button);
         progress = findViewById(R.id.progressBar);
-        back = findViewById(R.id.imageButton);
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                finish();
-
-            }
-        });
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,7 +45,7 @@ public class Login extends AppCompatActivity {
 
                 String p = phone.getText().toString();
 
-                if (p.length() == 10)
+                if (p.length() == 4)
                 {
 
 
@@ -79,7 +68,7 @@ public class Login extends AppCompatActivity {
 
                     AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
 
-                    Call<loginBean> call = cr.login(p , "");
+                    Call<loginBean> call = cr.verify(SharePreferenceUtils.getInstance().getString("phone") , p);
 
                     call.enqueue(new Callback<loginBean>() {
                         @Override
@@ -88,11 +77,11 @@ public class Login extends AppCompatActivity {
                             assert response.body() != null;
                             if (response.body().getStatus().equals("1"))
                             {
-                                //SharePreferenceUtils.getInstance().saveString("userId" , response.body().getUserId());
+                                SharePreferenceUtils.getInstance().saveString("userId" , response.body().getUserId());
                                 SharePreferenceUtils.getInstance().saveString("phone" , response.body().getPhone());
-                                Toast.makeText(Login.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(OTP.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
 
-                                Intent intent = new Intent(Login.this , OTP.class);
+                                Intent intent = new Intent(OTP.this , MainActivity.class);
                                 startActivity(intent);
                                 finishAffinity();
 
@@ -112,11 +101,12 @@ public class Login extends AppCompatActivity {
                 }
                 else
                 {
-                    Toast.makeText(Login.this, "Please enter a valid Phone Number", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OTP.this, "Please enter a valid OTP", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
+
 
     }
 }

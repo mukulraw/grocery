@@ -5,6 +5,7 @@ import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
 import com.mrtecks.grocery.homePOJO.homeBean;
 import com.mrtecks.grocery.ordersPOJO.ordersBean;
 import com.mrtecks.grocery.productsPOJO.productsBean;
+import com.mrtecks.grocery.searchPOJO.searchBean;
 import com.mrtecks.grocery.seingleProductPOJO.singleProductBean;
 import com.mrtecks.grocery.subCat1POJO.subCat1Bean;
 
@@ -47,10 +48,23 @@ public interface AllApiIneterface {
     );
 
     @Multipart
+    @POST("grocery/api/search.php")
+    Call<searchBean> search(
+            @Part("query") String query
+    );
+
+    @Multipart
     @POST("grocery/api/login.php")
     Call<loginBean> login(
             @Part("phone") String phone,
             @Part("token") String token
+    );
+
+    @Multipart
+    @POST("grocery/api/verify.php")
+    Call<loginBean> verify(
+            @Part("phone") String phone,
+            @Part("otp") String otp
     );
 
     @Multipart
@@ -102,6 +116,7 @@ public interface AllApiIneterface {
             @Part("txn") String txn,
             @Part("name") String name,
             @Part("address") String address,
-            @Part("pay_mode") String pay_mode
+            @Part("pay_mode") String pay_mode,
+            @Part("slot") String slot
     );
 }
