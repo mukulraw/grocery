@@ -66,12 +66,6 @@ public class Products extends AppCompatActivity {
 
         });
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
         progress.setVisibility(View.VISIBLE);
 
         Bean b = (Bean) getApplicationContext();
@@ -115,6 +109,14 @@ public class Products extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
             }
         });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
 
     }
 

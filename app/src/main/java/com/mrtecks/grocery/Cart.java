@@ -146,10 +146,18 @@ public class Cart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                if (amm > 299)
+                {
+                    Intent intent = new Intent(Cart.this , Checkout.class);
+                    intent.putExtra("amount" , String.valueOf(amm));
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(Cart.this, "Min. order amount is ₹ 300", Toast.LENGTH_SHORT).show();
+                }
 
-                Intent intent = new Intent(Cart.this , Checkout.class);
-                intent.putExtra("amount" , String.valueOf(amm));
-                startActivity(intent);
+
 
             }
         });

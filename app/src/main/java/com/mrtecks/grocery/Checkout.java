@@ -5,23 +5,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +41,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class Checkout extends AppCompatActivity {
 
     Toolbar toolbar;
-    EditText name , address;
+    EditText name , address , area , city , pin;
     Button proceed;
     ProgressBar progress;
     String amm;
@@ -44,6 +50,9 @@ public class Checkout extends AppCompatActivity {
     String paymode;
     RadioGroup group;
     String oid;
+    TextView date;
+
+    String dd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +68,10 @@ public class Checkout extends AppCompatActivity {
         progress = findViewById(R.id.progressBar4);
         slot = findViewById(R.id.spinner);
         group = findViewById(R.id.radioButton);
+        area = findViewById(R.id.editText5);
+        city = findViewById(R.id.editText6);
+        pin = findViewById(R.id.editText7);
+        date = findViewById(R.id.textView48);
 
 
         setSupportActionBar(toolbar);
@@ -101,6 +114,54 @@ public class Checkout extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final Dialog dialog = new Dialog(Checkout.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setCancelable(true);
+                dialog.setContentView(R.layout.date_dialog);
+                dialog.show();
+
+
+                final DatePicker picker = dialog.findViewById(R.id.date);
+                Button ok = dialog.findViewById(R.id.ok);
+
+                long now = System.currentTimeMillis() - 1000;
+                picker.setMaxDate(now);
+
+
+
+
+
+                ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        int year = picker.getYear();
+                        int month = picker.getMonth();
+                        int day = picker.getDayOfMonth();
+
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(year, month, day);
+
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                        String strDate = format.format(calendar.getTime());
+
+                        dialog.dismiss();
+
+                        date.setText("Date - " + strDate + " (click to change)");
+
+                        dd = strDate;
+
+                    }
+                });
 
             }
         });
