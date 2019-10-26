@@ -35,6 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.asksira.loopingviewpager.LoopingViewPager;
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.enums.Display;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mrtecks.grocery.cartPOJO.cartBean;
 import com.mrtecks.grocery.homePOJO.Banners;
@@ -121,6 +123,9 @@ public class MainActivity extends AppCompatActivity {
                 this, drawer, toolbar, R.string.navigation_drawer_open , R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+
+
 
 
         final String loc = SharePreferenceUtils.getInstance().getString("location");
@@ -345,6 +350,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        AppUpdater appUpdater = new AppUpdater(this);
+        appUpdater.setDisplay(Display.NOTIFICATION);
+        appUpdater.start();
 
     }
 
