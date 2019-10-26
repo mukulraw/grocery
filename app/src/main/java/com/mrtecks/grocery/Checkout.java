@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -24,11 +25,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import retrofit2.Call;
@@ -38,26 +45,29 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class Checkout extends AppCompatActivity {
+public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     Toolbar toolbar;
-    EditText name , address , area , city , pin;
+    EditText name, address, area, city, pin;
     Button proceed;
     ProgressBar progress;
-    String amm;
+    String amm , gtotal;
     Spinner slot;
     String tslot;
     String paymode;
     RadioGroup group;
     String oid;
     TextView date;
-
-    String dd;
+    TextView amount , grand;
+    String dd = "";
+    List<String> ts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
+
+        ts = new ArrayList<>();
 
         amm = getIntent().getStringExtra("amount");
 
@@ -72,6 +82,8 @@ public class Checkout extends AppCompatActivity {
         city = findViewById(R.id.editText6);
         pin = findViewById(R.id.editText7);
         date = findViewById(R.id.textView48);
+        amount = findViewById(R.id.textView49);
+        grand = findViewById(R.id.textView51);
 
 
         setSupportActionBar(toolbar);
@@ -91,24 +103,27 @@ public class Checkout extends AppCompatActivity {
         toolbar.setTitle("Checkout");
 
 
-        final List<String> ts = new ArrayList<>();
 
-        ts.add("9:30 - 12:30");
-        ts.add("12:30 - 3:30");
-        ts.add("4:00 - 7:00");
+        amount.setText("₹ " + amm);
+
+        float gt = Float.parseFloat(amm) + 15;
+
+        grand.setText("₹ " + gt);
+
+        gtotal = String.valueOf(gt);
 
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,ts);
-
-        slot.setAdapter(adapter);
 
 
         slot.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                tslot = ts.get(position);
+                if (!ts.get(position).equals("No time slot available for today"))
+                {
+                    tslot = ts.get(position);
+                }
+
 
             }
 
@@ -123,7 +138,44 @@ public class Checkout extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                final Dialog dialog = new Dialog(Checkout.this);
+
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        Checkout.this,
+                        now.get(Calendar.YEAR), // Initial year selection
+                        now.get(Calendar.MONTH), // Initial month selection
+                        now.get(Calendar.DAY_OF_MONTH) // Inital day selection
+                );
+
+
+                GregorianCalendar g1 = new GregorianCalendar();
+                g1.add(Calendar.DATE, 1);
+                GregorianCalendar gc = new GregorianCalendar();
+                gc.add(Calendar.DAY_OF_MONTH, 30);
+                List<Calendar> dayslist = new LinkedList<Calendar>();
+                Calendar[] daysArray;
+                Calendar cAux = Calendar.getInstance();
+                while (cAux.getTimeInMillis() <= gc.getTimeInMillis()) {
+                    if (cAux.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                        Calendar c = Calendar.getInstance();
+                        c.setTimeInMillis(cAux.getTimeInMillis());
+                        dayslist.add(c);
+                    }
+                    cAux.setTimeInMillis(cAux.getTimeInMillis() + (24 * 60 * 60 * 1000));
+                }
+                daysArray = new Calendar[dayslist.size()];
+                for (int i = 0; i < daysArray.length; i++) {
+                    daysArray[i] = dayslist.get(i);
+                }
+                dpd.setSelectableDays(daysArray);
+
+
+// If you're calling this from a support Fragment
+                dpd.show(getSupportFragmentManager(), "Datepickerdialog");
+
+
+
+                /*final Dialog dialog = new Dialog(Checkout.this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
                 dialog.setContentView(R.layout.date_dialog);
@@ -135,6 +187,7 @@ public class Checkout extends AppCompatActivity {
 
                 long now = System.currentTimeMillis() - 1000;
                 picker.setMaxDate(now);
+
 
 
 
@@ -161,7 +214,7 @@ public class Checkout extends AppCompatActivity {
                         dd = strDate;
 
                     }
-                });
+                });*/
 
             }
         });
@@ -173,109 +226,152 @@ public class Checkout extends AppCompatActivity {
 
                 String n = name.getText().toString();
                 String a = address.getText().toString();
+                String ar = area.getText().toString();
+                String c = city.getText().toString();
+                String p = pin.getText().toString();
 
-                if (n.length() > 0)
-                {
+                if (n.length() > 0) {
 
-                    if (a.length() > 0)
-                    {
+                    if (a.length() > 0) {
 
-                        int iidd = group.getCheckedRadioButtonId();
 
-                        if (iidd > -1)
+                        if (ar.length() > 0)
                         {
 
-                            RadioButton cb = group.findViewById(iidd);
-
-                            paymode = cb.getText().toString();
-
-
-
-                            oid = String.valueOf(System.currentTimeMillis());
-
-                            if (paymode.equals("Cash on Delivery"))
+                            if (c.length() > 0)
                             {
-                                progress.setVisibility(View.VISIBLE);
 
-                                Bean b = (Bean) getApplicationContext();
+                                if (p.length() > 0)
+                                {
 
-                                Retrofit retrofit = new Retrofit.Builder()
-                                        .baseUrl(b.baseurl)
-                                        .addConverterFactory(ScalarsConverterFactory.create())
-                                        .addConverterFactory(GsonConverterFactory.create())
-                                        .build();
+                                    int iidd = group.getCheckedRadioButtonId();
 
-                                AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+                                    if (iidd > -1) {
 
-                                Call<checkoutBean> call = cr.buyVouchers(
-                                        SharePreferenceUtils.getInstance().getString("userId"),
-                                        amm,
-                                        oid,
-                                        n,
-                                        a,
-                                        paymode,
-                                        tslot
-                                );
-                                call.enqueue(new Callback<checkoutBean>() {
-                                    @Override
-                                    public void onResponse(Call<checkoutBean> call, Response<checkoutBean> response) {
 
-                                        Toast.makeText(Checkout.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                        if (dd.length() > 0)
+                                        {
 
-                                        progress.setVisibility(View.GONE);
+                                            if (tslot.length() >0)
+                                            {
+                                                RadioButton cb = group.findViewById(iidd);
 
-                                        finish();
+                                                paymode = cb.getText().toString();
 
+
+                                                oid = String.valueOf(System.currentTimeMillis());
+
+                                                if (paymode.equals("Cash on Delivery")) {
+                                                    progress.setVisibility(View.VISIBLE);
+
+                                                    Bean b = (Bean) getApplicationContext();
+
+                                                    String adr = a + ", " + ar + ", " + c + ", " + p;
+
+                                                    Log.d("addd" , adr);
+
+                                                    Retrofit retrofit = new Retrofit.Builder()
+                                                            .baseUrl(b.baseurl)
+                                                            .addConverterFactory(ScalarsConverterFactory.create())
+                                                            .addConverterFactory(GsonConverterFactory.create())
+                                                            .build();
+
+                                                    AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+                                                    Call<checkoutBean> call = cr.buyVouchers(
+                                                            SharePreferenceUtils.getInstance().getString("userId"),
+                                                            gtotal,
+                                                            oid,
+                                                            n,
+                                                            adr,
+                                                            paymode,
+                                                            tslot
+                                                    );
+                                                    call.enqueue(new Callback<checkoutBean>() {
+                                                        @Override
+                                                        public void onResponse(Call<checkoutBean> call, Response<checkoutBean> response) {
+
+                                                            Toast.makeText(Checkout.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+
+                                                            progress.setVisibility(View.GONE);
+
+                                                            finish();
+
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Call<checkoutBean> call, Throwable t) {
+                                                            progress.setVisibility(View.GONE);
+                                                        }
+                                                    });
+                                                } else {
+
+
+                                                    Intent intent = new Intent(Checkout.this, WebViewActivity.class);
+                                                    intent.putExtra(AvenuesParams.ACCESS_CODE, "AVOL70EE77BF91LOFB");
+                                                    intent.putExtra(AvenuesParams.MERCHANT_ID, "133862");
+                                                    intent.putExtra(AvenuesParams.ORDER_ID, oid);
+                                                    intent.putExtra(AvenuesParams.CURRENCY, "INR");
+                                                    intent.putExtra(AvenuesParams.AMOUNT, String.valueOf(gtotal));
+                                                    //intent.putExtra(AvenuesParams.AMOUNT, "1");
+                                                    intent.putExtra("pid", SharePreferenceUtils.getInstance().getString("userid"));
+
+                                                    intent.putExtra(AvenuesParams.REDIRECT_URL, "https://mrtecks.com/grocery/api/pay/ccavResponseHandler.php");
+                                                    intent.putExtra(AvenuesParams.CANCEL_URL, "https://mrtecks.com/grocery/api/pay/ccavResponseHandler.php");
+                                                    intent.putExtra(AvenuesParams.RSA_KEY_URL, "https://mrtecks.com/grocery/api/pay/GetRSA.php");
+
+                                                    startActivityForResult(intent, 12);
+
+
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Toast.makeText(Checkout.this, "Please select a Delivery Time Slot", Toast.LENGTH_SHORT).show();
+                                            }
+
+
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(Checkout.this, "Please select a Delivery Date", Toast.LENGTH_SHORT).show();
+                                        }
+
+
+
+
+
+                                    } else {
+                                        Toast.makeText(Checkout.this, "Please select a Payment Mode", Toast.LENGTH_SHORT).show();
                                     }
 
-                                    @Override
-                                    public void onFailure(Call<checkoutBean> call, Throwable t) {
-                                        progress.setVisibility(View.GONE);
-                                    }
-                                });
+                                }
+                                else
+                                {
+                                    Toast.makeText(Checkout.this, "Please select a valid PIN Code", Toast.LENGTH_SHORT).show();
+                                }
+
                             }
                             else
                             {
-
-
-                                Intent intent = new Intent(Checkout.this, WebViewActivity.class);
-                                intent.putExtra(AvenuesParams.ACCESS_CODE, "AVOL70EE77BF91LOFB");
-                                intent.putExtra(AvenuesParams.MERCHANT_ID, "133862");
-                                intent.putExtra(AvenuesParams.ORDER_ID, oid);
-                                intent.putExtra(AvenuesParams.CURRENCY, "INR");
-                                intent.putExtra(AvenuesParams.AMOUNT, String.valueOf(amm));
-                                //intent.putExtra(AvenuesParams.AMOUNT, "1");
-                                intent.putExtra("pid", SharePreferenceUtils.getInstance().getString("userid"));
-
-                                intent.putExtra(AvenuesParams.REDIRECT_URL, "https://mrtecks.com/grocery/api/pay/ccavResponseHandler.php");
-                                intent.putExtra(AvenuesParams.CANCEL_URL, "https://mrtecks.com/grocery/api/pay/ccavResponseHandler.php");
-                                intent.putExtra(AvenuesParams.RSA_KEY_URL, "https://mrtecks.com/grocery/api/pay/GetRSA.php");
-
-                                startActivityForResult(intent , 12);
-
-
+                                Toast.makeText(Checkout.this, "Please select a valid City", Toast.LENGTH_SHORT).show();
                             }
-
-
 
                         }
                         else
                         {
-                            Toast.makeText(Checkout.this, "Please select a Payment Mode", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Checkout.this, "Please select a valid Locality/ Area/ District", Toast.LENGTH_SHORT).show();
                         }
 
 
 
 
-                    }
-                    else
-                    {
-                        Toast.makeText(Checkout.this, "Please enter a valid address", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(Checkout.this, "Please enter a valid House/ Apartment No.", Toast.LENGTH_SHORT).show();
                     }
 
-                }
-                else
-                {
+                } else {
                     Toast.makeText(Checkout.this, "Please enter a valid name", Toast.LENGTH_SHORT).show();
                 }
 
@@ -304,13 +400,21 @@ public class Checkout extends AppCompatActivity {
 
             String n = name.getText().toString();
             String a = address.getText().toString();
+            String ar = area.getText().toString();
+            String c = city.getText().toString();
+            String p = pin.getText().toString();
+
+            String adr = a + ", " + ar + ", " + c + ", " + p;
+
+            Log.d("addd" , adr);
+
 
             Call<checkoutBean> call = cr.buyVouchers(
                     SharePreferenceUtils.getInstance().getString("userId"),
                     amm,
                     oid,
                     n,
-                    a,
+                    adr,
                     "online",
                     tslot
             );
@@ -331,6 +435,122 @@ public class Checkout extends AppCompatActivity {
                     progress.setVisibility(View.GONE);
                 }
             });
+
+        }
+
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, monthOfYear, dayOfMonth);
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String strDate = format.format(calendar.getTime());
+
+
+        date.setText(strDate + " (click to change)");
+
+        dd = strDate;
+
+
+        Date c = Calendar.getInstance().getTime();
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = df.format(c);
+
+        Log.d("current date" , formattedDate);
+
+        if (dd.equals(formattedDate))
+        {
+
+            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+
+            Log.d("today" , currentTime);
+
+            String time1 = "12:30";
+            String time2 = "15:30";
+            String time3 = "19:00";
+
+            Date date1 = null;
+            Date date2 = null;
+            Date date3 = null;
+            Date cd = null;
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+
+            try {
+                cd = dateFormat.parse(currentTime);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+            try {
+                date1 = dateFormat.parse(time1);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            try {
+                date2 = dateFormat.parse(time2);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            try {
+                date3 = dateFormat.parse(time3);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            ts.clear();
+            tslot = "";
+
+
+            if (date1.compareTo(cd) < 0)
+            {
+                ts.add("9:30 - 12:30");
+            }
+
+            if (date2.compareTo(cd) < 0)
+            {
+                ts.add("12:30 - 3:30");
+            }
+
+            if (date3.compareTo(cd) < 0)
+            {
+                ts.add("4:00 - 7:00");
+            }
+            else
+            {
+                ts.add("No time slot available for today");
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, ts);
+
+            slot.setAdapter(adapter);
+
+
+        }
+        else
+        {
+            Log.d("today" , "false");
+            ts.clear();
+            tslot = "";
+
+
+            ts.add("9:30 - 12:30");
+            ts.add("12:30 - 3:30");
+            ts.add("4:00 - 7:00");
+
+
+
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, ts);
+
+            slot.setAdapter(adapter);
 
         }
 

@@ -203,7 +203,7 @@ public class Cart extends AppCompatActivity {
                     amm = Float.parseFloat(response.body().getTotal());
 
 
-                    btotal.setText("Total: Rs. " + response.body().getTotal());
+                    btotal.setText("Total: \u20B9 " + response.body().getTotal());
 
                     bottom.setVisibility(View.VISIBLE);
                 } else {
