@@ -53,7 +53,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
     ProgressBar progress;
     String amm , gtotal;
     Spinner slot;
-    String tslot;
+    String tslot = "";
     String paymode;
     RadioGroup group;
     String oid;
@@ -122,6 +122,10 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                 if (!ts.get(position).equals("No time slot available for today"))
                 {
                     tslot = ts.get(position);
+                }
+                else
+                {
+                    tslot = "";
                 }
 
 
