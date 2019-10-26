@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -299,7 +300,27 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
                                                             progress.setVisibility(View.GONE);
 
-                                                            finish();
+                                                            Dialog dialog = new Dialog(Checkout.this, R.style.DialogCustomTheme);
+                                                            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                                            dialog.setCancelable(true);
+                                                            dialog.setContentView(R.layout.success_popup);
+                                                            dialog.show();
+
+                                                            TextView oi = dialog.findViewById(R.id.textView57);
+                                                            TextView au = dialog.findViewById(R.id.textView58);
+
+                                                            oi.setText(oid);
+                                                            au.setText("₹ " + gtotal);
+
+                                                            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                                                @Override
+                                                                public void onCancel(DialogInterface dialog) {
+
+                                                                    dialog.dismiss();
+                                                                    finish();
+
+                                                                }
+                                                            });
 
                                                         }
 
@@ -430,7 +451,32 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
                     progress.setVisibility(View.GONE);
 
-                    finish();
+
+
+                    Dialog dialog = new Dialog(Checkout.this, R.style.DialogCustomTheme);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setCancelable(true);
+                    dialog.setContentView(R.layout.success_popup);
+                    dialog.show();
+
+
+                    TextView oi = dialog.findViewById(R.id.textView57);
+                    TextView au = dialog.findViewById(R.id.textView58);
+
+                    oi.setText(oid);
+                    au.setText("₹ " + gtotal);
+
+
+                    dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+
+                            dialog.dismiss();
+                            finish();
+
+                        }
+                    });
+
 
                 }
 
@@ -473,9 +519,9 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
             Log.d("today" , currentTime);
 
-            String time1 = "12:30";
-            String time2 = "15:30";
-            String time3 = "19:00";
+            String time1 = "09:30";
+            String time2 = "12:30";
+            String time3 = "16:00";
 
             Date date1 = null;
             Date date2 = null;
@@ -511,17 +557,17 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
             tslot = "";
 
 
-            if (date1.compareTo(cd) < 0)
+            if (date1.compareTo(cd) > 0)
             {
                 ts.add("9:30 - 12:30");
             }
 
-            if (date2.compareTo(cd) < 0)
+            if (date2.compareTo(cd) > 0)
             {
                 ts.add("12:30 - 3:30");
             }
 
-            if (date3.compareTo(cd) < 0)
+            if (date3.compareTo(cd) > 0)
             {
                 ts.add("4:00 - 7:00");
             }

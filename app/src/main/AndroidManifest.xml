@@ -13,19 +13,33 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".OrderDetails"></activity>
-        <activity android:name=".OTP" />
-        <activity android:name=".Location" />
-        <activity android:name=".Search" />
-        <activity android:name=".Orders" />
-        <activity android:name=".Checkout" />
-        <activity android:name=".Cart" />
-        <activity android:name=".SingleProduct" />
-        <activity android:name=".Products" />
-        <activity android:name=".SubCat" />
-        <activity android:name=".Category" />
-        <activity android:name=".Login" />
-        <activity android:name=".Spalsh">
+        <activity android:name=".OrderDetails"
+            android:screenOrientation="portrait"
+            ></activity>
+        <activity android:name=".OTP"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Location"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Search"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Orders"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Checkout"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Cart"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SingleProduct"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Products"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SubCat"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Category"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Login"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Spalsh"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,6 +48,29 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".WebViewActivity" />
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:permission="">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/loggg" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+        <!--
+ Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more.
+        -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+
     </application>
 
 </manifest>
