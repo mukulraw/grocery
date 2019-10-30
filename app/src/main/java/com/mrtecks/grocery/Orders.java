@@ -174,6 +174,7 @@ public class Orders extends AppCompatActivity {
             viewHolder.slot.setText(item.getSlot());
             viewHolder.amount.setText("\u20B9 " + item.getAmount());
 
+            viewHolder.deldate.setText(item.getDelivery_date());
 
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -195,7 +196,7 @@ public class Orders extends AppCompatActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-            TextView txn , date , status , name , address , amount , pay , slot;
+            TextView txn , date , status , name , address , amount , pay , slot , deldate;
 
 
             ViewHolder(@NonNull View itemView) {
@@ -208,7 +209,8 @@ public class Orders extends AppCompatActivity {
                 address = itemView.findViewById(R.id.textView34);
                 amount = itemView.findViewById(R.id.textView30);
                 pay = itemView.findViewById(R.id.textView40);
-                slot = itemView.findViewById(R.id.textView42);
+                slot = itemView.findViewById(R.id.textView62);
+                deldate = itemView.findViewById(R.id.textView42);
 
 
             }

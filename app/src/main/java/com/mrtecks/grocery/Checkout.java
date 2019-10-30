@@ -290,7 +290,8 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                                                             n,
                                                             adr,
                                                             paymode,
-                                                            tslot
+                                                            tslot,
+                                                            dd
                                                     );
                                                     call.enqueue(new Callback<checkoutBean>() {
                                                         @Override
@@ -441,7 +442,8 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                     n,
                     adr,
                     "online",
-                    tslot
+                    tslot,
+                    dd
             );
             call.enqueue(new Callback<checkoutBean>() {
                 @Override

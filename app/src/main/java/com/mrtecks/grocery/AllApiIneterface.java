@@ -124,6 +124,7 @@ public interface AllApiIneterface {
             @Part("name") String name,
             @Part("address") String address,
             @Part("pay_mode") String pay_mode,
-            @Part("slot") String slot
+            @Part("slot") String slot,
+            @Part("date") String date
     );
 }

@@ -32,6 +32,10 @@ public class Datum {
     @Expose
     private String slot;
 
+    @SerializedName("delivery_date")
+    @Expose
+    private String delivery_date;
+
     public String getId() {
         return id;
     }
@@ -102,5 +106,13 @@ public class Datum {
 
     public void setSlot(String slot) {
         this.slot = slot;
+    }
+
+    public String getDelivery_date() {
+        return delivery_date;
+    }
+
+    public void setDelivery_date(String delivery_date) {
+        this.delivery_date = delivery_date;
     }
 }
