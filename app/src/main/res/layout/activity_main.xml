@@ -256,10 +256,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
-            <com.asksira.loopingviewpager.LoopingViewPager
+            <com.santalu.autoviewpager.AutoViewPager
                 android:id="@+id/viewPager"
                 android:layout_width="0dp"
                 android:layout_height="200dp"
+                app:avp_autoScroll="true"
+                app:avp_duration="2000"
+                app:avp_indeterminate="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

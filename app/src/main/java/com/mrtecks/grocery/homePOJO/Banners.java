@@ -13,6 +13,12 @@ public class Banners {
     @SerializedName("created")
     @Expose
     private String created;
+    @SerializedName("cname")
+    @Expose
+    private String cname;
+    @SerializedName("cid")
+    @Expose
+    private String cid;
 
     public String getId() {
         return id;
@@ -36,5 +42,21 @@ public class Banners {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    public String getCid() {
+        return cid;
+    }
+
+    public void setCid(String cid) {
+        this.cid = cid;
+    }
+
+    public void setCname(String cname) {
+        this.cname = cname;
+    }
+
+    public String getCname() {
+        return cname;
     }
 }

@@ -34,7 +34,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.asksira.loopingviewpager.LoopingViewPager;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -47,6 +46,7 @@ import com.mrtecks.grocery.homePOJO.homeBean;
 import com.mrtecks.grocery.seingleProductPOJO.singleProductBean;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.santalu.autoviewpager.AutoViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     Toolbar toolbar;
-    LoopingViewPager pager;
+    AutoViewPager pager;
     Button search, category;
     RecyclerView bestSelling, offerBanners, todayDeals, member, categories;
     TextView readMore;
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     List<Cat> list3;
     DrawerLayout drawer;
 
-    TextView login , logout , cart , orders , title , count , location;
+    TextView login , logout , cart , orders , title , count , location , terms , about;
 
     ImageButton cart1;
 
@@ -113,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
         cart1 = findViewById(R.id.imageButton3);
         count = findViewById(R.id.count);
         location = findViewById(R.id.home);
+        terms = findViewById(R.id.terms);
+        about = findViewById(R.id.about);
 
         setSupportActionBar(toolbar);
 
@@ -235,7 +237,31 @@ public class MainActivity extends AppCompatActivity {
         categories.setLayoutManager(manager5);
 
 
+        terms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Intent intent = new Intent(MainActivity.this , Web.class);
+                intent.putExtra("title" , "Terms & Conditions");
+                intent.putExtra("url" , "https://mrtecks.com/grocery/terms.php");
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+
+            }
+        });
+
+        about.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(MainActivity.this , Web.class);
+                intent.putExtra("title" , "About Us");
+                intent.putExtra("url" , "https://mrtecks.com/grocery/about.php");
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+
+            }
+        });
 
 
         category.setOnClickListener(new View.OnClickListener() {
@@ -486,7 +512,7 @@ loadCart();
         @Override
         public Fragment getItem(int position) {
             page frag = new page();
-            frag.setData(blist.get(position).getImage());
+            frag.setData(blist.get(position).getImage() , blist.get(position).getCname() , blist.get(position).getCid());
             return frag;
         }
 
@@ -500,13 +526,15 @@ loadCart();
     public static class page extends Fragment
     {
 
-        String url;
+        String url , tit , cid = "";
 
         ImageView image;
 
-        void setData(String url)
+        void setData(String url , String tit , String cid)
         {
             this.url = url;
+            this.tit = tit;
+            this.cid = cid;
         }
 
         @Nullable
@@ -519,6 +547,25 @@ loadCart();
             DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).resetViewBeforeLoading(false).build();
             ImageLoader loader = ImageLoader.getInstance();
             loader.displayImage(url , image , options);
+
+
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if (cid != null)
+                    {
+                        Intent intent = new Intent(getContext() , SubCat.class);
+                        intent.putExtra("id" , cid);
+                        intent.putExtra("title" , tit);
+                        startActivity(intent);
+                    }
+
+
+
+                }
+            });
+
 
             return view;
         }

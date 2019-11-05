@@ -13,32 +13,45 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".OrderDetails"
-            android:screenOrientation="portrait"
-            ></activity>
-        <activity android:name=".OTP"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Location"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Search"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Orders"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Checkout"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Cart"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".SingleProduct"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Products"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".SubCat"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Category"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Login"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Spalsh"
+        <activity android:name=".Web"></activity>
+        <activity
+            android:name=".OrderDetails"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".OTP"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Location"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Search"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Orders"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Checkout"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Cart"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SingleProduct"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Products"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SubCat"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Category"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Login"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Spalsh"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -70,7 +83,6 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
-
     </application>
 
 </manifest>
