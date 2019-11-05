@@ -654,7 +654,10 @@ loadCart();
                                 Log.d("quantity" , String.valueOf(stepperTouch.getCount()));
                                 Log.d("price" , nv1);
 
-                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userId") , item.getId() , String.valueOf(stepperTouch.getCount()), nv1);
+                                int versionCode = BuildConfig.VERSION_CODE;
+                                String versionName = BuildConfig.VERSION_NAME;
+
+                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userId") , item.getId() , String.valueOf(stepperTouch.getCount()), nv1 , versionName);
 
                                 call.enqueue(new Callback<singleProductBean>() {
                                     @Override

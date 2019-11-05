@@ -79,7 +79,7 @@ public class Login extends AppCompatActivity {
 
                     AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
 
-                    Call<loginBean> call = cr.login(p , "");
+                    Call<loginBean> call = cr.login(p , SharePreferenceUtils.getInstance().getString("token"));
 
                     call.enqueue(new Callback<loginBean>() {
                         @Override

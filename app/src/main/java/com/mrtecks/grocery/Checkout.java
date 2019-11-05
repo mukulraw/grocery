@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mrtecks.grocery.checkPromoPOJO.checkPromoBean;
 import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
@@ -49,8 +50,8 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     Toolbar toolbar;
-    EditText name, address, area, city, pin;
-    Button proceed;
+    EditText name, address, area, city, pin , promo;
+    Button proceed , apply;
     ProgressBar progress;
     String amm , gtotal;
     Spinner slot;
@@ -62,6 +63,8 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
     TextView amount , grand;
     String dd = "";
     List<String> ts;
+
+    String pid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,8 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
         date = findViewById(R.id.textView48);
         amount = findViewById(R.id.textView49);
         grand = findViewById(R.id.textView51);
+        promo = findViewById(R.id.editText8);
+        apply = findViewById(R.id.button9);
 
 
         setSupportActionBar(toolbar);
@@ -225,6 +230,85 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
         });
 
 
+
+        apply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String pc = promo.getText().toString();
+
+                if (pc.length() > 0)
+                {
+
+
+                    progress.setVisibility(View.VISIBLE);
+
+                    Bean b = (Bean) getApplicationContext();
+
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl(b.baseurl)
+                            .addConverterFactory(ScalarsConverterFactory.create())
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+
+                    AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+                    Call<checkPromoBean> call = cr.checkPromo(pc , SharePreferenceUtils.getInstance().getString("userId"));
+
+                    call.enqueue(new Callback<checkPromoBean>() {
+                        @Override
+                        public void onResponse(Call<checkPromoBean> call, Response<checkPromoBean> response) {
+
+                            if (response.body().getStatus().equals("1"))
+                            {
+
+                                float amt = Float.parseFloat(amm);
+                                float dis = Float.parseFloat(response.body().getData().getDiscount());
+
+                                float da = (dis / 100) * amt;
+
+                                float na = amt - da;
+
+                                amm = String.valueOf(na);
+
+                                amount.setText("₹ " + amm);
+
+                                float gt = Float.parseFloat(amm) + 15;
+
+                                grand.setText("₹ " + gt);
+
+                                gtotal = String.valueOf(gt);
+
+                                pid = response.body().getData().getPid();
+
+                                Toast.makeText(Checkout.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+
+                            }
+                            else
+                            {
+                                Toast.makeText(Checkout.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            progress.setVisibility(View.GONE);
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<checkPromoBean> call, Throwable t) {
+                            progress.setVisibility(View.GONE);
+                        }
+                    });
+
+                }
+                else
+                {
+                    Toast.makeText(Checkout.this, "Invalid PROMO code", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -291,7 +375,8 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                                                             adr,
                                                             paymode,
                                                             tslot,
-                                                            dd
+                                                            dd,
+                                                            pid
                                                     );
                                                     call.enqueue(new Callback<checkoutBean>() {
                                                         @Override
@@ -443,7 +528,8 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                     adr,
                     "online",
                     tslot,
-                    dd
+                    dd,
+                    pid
             );
             call.enqueue(new Callback<checkoutBean>() {
                 @Override

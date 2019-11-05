@@ -1,6 +1,7 @@
 package com.mrtecks.grocery;
 
 import com.mrtecks.grocery.cartPOJO.cartBean;
+import com.mrtecks.grocery.checkPromoPOJO.checkPromoBean;
 import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
 import com.mrtecks.grocery.homePOJO.homeBean;
 import com.mrtecks.grocery.orderDetailsPOJO.orderDetailsBean;
@@ -74,7 +75,8 @@ public interface AllApiIneterface {
             @Part("user_id") String user_id,
             @Part("product_id") String product_id,
             @Part("quantity") String quantity,
-            @Part("unit_price") String unit_price
+            @Part("unit_price") String unit_price,
+            @Part("version") String version
     );
 
     @Multipart
@@ -116,6 +118,13 @@ public interface AllApiIneterface {
     );
 
     @Multipart
+    @POST("grocery/api/checkPromo.php")
+    Call<checkPromoBean> checkPromo(
+            @Part("promo") String promo,
+            @Part("user_id") String user_id
+    );
+
+    @Multipart
     @POST("grocery/api/buyVouchers.php")
     Call<checkoutBean> buyVouchers(
             @Part("user_id") String user_id,
@@ -125,6 +134,7 @@ public interface AllApiIneterface {
             @Part("address") String address,
             @Part("pay_mode") String pay_mode,
             @Part("slot") String slot,
-            @Part("date") String date
+            @Part("date") String date,
+            @Part("promo") String promo
     );
 }

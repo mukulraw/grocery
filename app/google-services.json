@@ -126,6 +126,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "723362617491-lav6hpvkl267rrb4iplntsqaml5t3hmd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mrtecks.grocery",
+            "certificate_hash": "ccddf5fe438e61fd600262d7b39d4af46defab0c"
+          }
+        },
+        {
           "client_id": "723362617491-qcg2ks80or8icnh9q0um1lbkqmotvnhv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

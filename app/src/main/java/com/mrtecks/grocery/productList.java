@@ -253,7 +253,10 @@ public class productList extends Fragment {
                                 Log.d("quantity" , String.valueOf(stepperTouch.getCount()));
                                 Log.d("price" , finalNv);
 
-                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userId") , item.getId() , String.valueOf(stepperTouch.getCount()), finalNv);
+                                int versionCode = BuildConfig.VERSION_CODE;
+                                String versionName = BuildConfig.VERSION_NAME;
+
+                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userId") , item.getId() , String.valueOf(stepperTouch.getCount()), finalNv , versionName);
 
                                 call.enqueue(new Callback<singleProductBean>() {
                                     @Override
