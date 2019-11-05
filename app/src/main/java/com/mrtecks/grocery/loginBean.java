@@ -16,6 +16,9 @@ public class loginBean {
     @SerializedName("phone")
     @Expose
     private String phone;
+    @SerializedName("rewards")
+    @Expose
+    private String rewards;
 
     public String getStatus() {
         return status;
@@ -47,5 +50,13 @@ public class loginBean {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getRewards() {
+        return rewards;
+    }
+
+    public void setRewards(String rewards) {
+        this.rewards = rewards;
     }
 }

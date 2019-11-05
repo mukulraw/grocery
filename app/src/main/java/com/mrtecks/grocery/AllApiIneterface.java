@@ -94,6 +94,12 @@ public interface AllApiIneterface {
     );
 
     @Multipart
+    @POST("grocery/api/getRew.php")
+    Call<String> getRew(
+            @Part("user_id") String user_id
+    );
+
+    @Multipart
     @POST("grocery/api/clearCart.php")
     Call<singleProductBean> clearCart(
             @Part("user_id") String user_id

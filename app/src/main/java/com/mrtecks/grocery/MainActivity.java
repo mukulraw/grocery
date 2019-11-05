@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     List<Cat> list3;
     DrawerLayout drawer;
 
-    TextView login , logout , cart , orders , title , count , location , terms , about;
+    TextView login , logout , cart , orders , title , count , location , terms , about , rewards;
 
     ImageButton cart1;
 
@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         location = findViewById(R.id.home);
         terms = findViewById(R.id.terms);
         about = findViewById(R.id.about);
+        rewards = findViewById(R.id.rewards);
 
         setSupportActionBar(toolbar);
 
@@ -289,6 +290,13 @@ public class MainActivity extends AppCompatActivity {
         if (uid.length() > 0)
         {
             login.setText(SharePreferenceUtils.getInstance().getString("phone"));
+            rewards.setText("REWARD POINTS - " + SharePreferenceUtils.getInstance().getString("rewards"));
+            rewards.setVisibility(View.VISIBLE);
+            getRew();
+        }
+        else
+        {
+            rewards.setVisibility(View.GONE);
         }
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -492,6 +500,9 @@ loadCart();
                     progress.setVisibility(View.GONE);
                 }
             });
+
+            getRew();
+
         }
         else
         {
@@ -1053,5 +1064,46 @@ loadCart();
         }
     }
 
+    void getRew()
+    {
+
+        progress.setVisibility(View.VISIBLE);
+
+        Bean b = (Bean) getApplicationContext();
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.level(HttpLoggingInterceptor.Level.HEADERS);
+        logging.level(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(b.baseurl)
+                .client(client)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+        Call<String> call = cr.getRew(SharePreferenceUtils.getInstance().getString("user_id"));
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                rewards.setText("REWARD POINTS - " + response.body());
+
+                progress.setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                progress.setVisibility(View.GONE);
+            }
+        });
+
+    }
 
 }
