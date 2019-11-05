@@ -61,6 +61,9 @@ public class Best {
     @SerializedName("created")
     @Expose
     private String created;
+    @SerializedName("stock")
+    @Expose
+    private String stock;
 
     public String getId() {
         return id;
@@ -212,5 +215,13 @@ public class Best {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    public String getStock() {
+        return stock;
+    }
+
+    public void setStock(String stock) {
+        this.stock = stock;
     }
 }

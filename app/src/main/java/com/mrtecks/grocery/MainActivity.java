@@ -563,6 +563,17 @@ loadCart();
 
             final String nv1;
 
+            if (item.getStock().equals("In stock"))
+            {
+                holder.add.setEnabled(true);
+            }
+            else
+            {
+                holder.add.setEnabled(false);
+            }
+
+            holder.stock.setText(item.getStock());
+
             if (dis > 0)
             {
 
@@ -709,7 +720,7 @@ loadCart();
         {
 
             ImageView image;
-            TextView price , title , discount;
+            TextView price , title , discount , stock;
             Button add;
 
             public ViewHolder(@NonNull View itemView) {
@@ -720,6 +731,7 @@ loadCart();
                 title = itemView.findViewById(R.id.textView12);
                 discount = itemView.findViewById(R.id.textView10);
                 add = itemView.findViewById(R.id.button5);
+                stock = itemView.findViewById(R.id.textView63);
 
 
 

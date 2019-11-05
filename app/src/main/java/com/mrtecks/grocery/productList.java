@@ -160,8 +160,23 @@ public class productList extends Fragment {
             ImageLoader loader = ImageLoader.getInstance();
             loader.displayImage(item.getImage() , holder.image , options);
 
+
+            if (item.getStock().equals("In stock"))
+            {
+                holder.add.setEnabled(true);
+            }
+            else
+            {
+                holder.add.setEnabled(false);
+            }
+
+            holder.stock.setText(item.getStock());
+
+
             float dis = Float.parseFloat(item.getDiscount());
             String nv1 = null;
+
+
             if (dis > 0)
             {
 
@@ -307,7 +322,7 @@ public class productList extends Fragment {
         {
 
             ImageView image;
-            TextView price , title , discount;
+            TextView price , title , discount , stock;
             Button add;
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -317,6 +332,7 @@ public class productList extends Fragment {
                 title = itemView.findViewById(R.id.textView12);
                 discount = itemView.findViewById(R.id.textView10);
                 add = itemView.findViewById(R.id.button5);
+                stock = itemView.findViewById(R.id.textView64);
 
             }
         }

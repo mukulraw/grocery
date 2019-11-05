@@ -41,7 +41,7 @@ public class SingleProduct extends AppCompatActivity {
     TextView discount , title , price;
     Button add;
     TextView brand , unit , seller;
-    TextView description , key_features , packaging , life , disclaimer;
+    TextView description , key_features , packaging , life , disclaimer , stock;
     ProgressBar progress;
 
     String id , name;
@@ -71,6 +71,7 @@ public class SingleProduct extends AppCompatActivity {
         life = findViewById(R.id.life);
         disclaimer = findViewById(R.id.disclaimer);
         progress = findViewById(R.id.progress);
+        stock = findViewById(R.id.stock);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -267,6 +268,21 @@ public class SingleProduct extends AppCompatActivity {
                     packaging.setText(item.getPackagingType());
                     life.setText(item.getShelfLife());
                     disclaimer.setText(item.getDisclaimer());
+
+
+
+                    if (item.getStock().equals("In stock"))
+                    {
+                        add.setEnabled(true);
+                    }
+                    else
+                    {
+                        add.setEnabled(false);
+                    }
+
+                    stock.setText(item.getStock());
+
+
 
                 }
 
