@@ -8,8 +8,8 @@ android {
         applicationId "com.mrtecks.grocery"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 8
-        versionName "1.6"
+        versionCode 9
+        versionName "1.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

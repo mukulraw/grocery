@@ -112,7 +112,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
         amount.setText("₹ " + amm);
 
-        float gt = Float.parseFloat(amm) + 15;
+        float gt = Float.parseFloat(amm) + 0;
 
         grand.setText("₹ " + gt);
 
@@ -273,7 +273,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
                                 amount.setText("₹ " + amm);
 
-                                float gt = Float.parseFloat(amm) + 15;
+                                float gt = Float.parseFloat(amm) + 0;
 
                                 grand.setText("₹ " + gt);
 

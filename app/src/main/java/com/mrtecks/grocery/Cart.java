@@ -146,7 +146,7 @@ public class Cart extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (amm > 199)
+                if (amm > 0)
                 {
                     Intent intent = new Intent(Cart.this , Checkout.class);
                     intent.putExtra("amount" , String.valueOf(amm));
@@ -154,7 +154,7 @@ public class Cart extends AppCompatActivity {
                 }
                 else
                 {
-                    Toast.makeText(Cart.this, "Min. order amount is ₹ 200", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Cart.this, "Invalid amount", Toast.LENGTH_SHORT).show();
                 }
 
 
