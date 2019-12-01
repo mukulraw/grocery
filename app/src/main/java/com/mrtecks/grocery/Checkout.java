@@ -16,6 +16,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -25,6 +26,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mrtecks.grocery.addressPOJO.Datum;
+import com.mrtecks.grocery.addressPOJO.addressBean;
 import com.mrtecks.grocery.checkPromoPOJO.checkPromoBean;
 import com.mrtecks.grocery.checkoutPOJO.checkoutBean;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -54,7 +57,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
     Button proceed , apply;
     ProgressBar progress;
     String amm , gtotal;
-    Spinner slot;
+    Spinner slot , addr;
     String tslot = "";
     String paymode;
     RadioGroup group;
@@ -66,12 +69,19 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
     String pid;
 
+    List<String> list;
+    List<Datum> adlist;
+
+    String isnew = "1";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkout);
 
+        list = new ArrayList<>();
         ts = new ArrayList<>();
+        adlist = new ArrayList<>();
 
         amm = getIntent().getStringExtra("amount");
 
@@ -81,6 +91,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
         proceed = findViewById(R.id.button6);
         progress = findViewById(R.id.progressBar4);
         slot = findViewById(R.id.spinner);
+        addr = findViewById(R.id.spinner2);
         group = findViewById(R.id.radioButton);
         area = findViewById(R.id.editText5);
         city = findViewById(R.id.editText6);
@@ -119,7 +130,89 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
         gtotal = String.valueOf(gt);
 
 
+        progress.setVisibility(View.VISIBLE);
 
+        Bean b = (Bean) getApplicationContext();
+
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(b.baseurl)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+
+        Call<addressBean> call = cr.getAddress(SharePreferenceUtils.getInstance().getString("userId"));
+        call.enqueue(new Callback<addressBean>() {
+            @Override
+            public void onResponse(Call<addressBean> call, Response<addressBean> response) {
+
+                list.clear();
+                adlist.clear();
+
+                list.add("New Address");
+
+                if (response.body().getData().size() > 0) {
+
+                    adlist.addAll(response.body().getData());
+
+                    for (int i = 0 ; i < response.body().getData().size() ; i++)
+                    {
+                        list.add(response.body().getData().get(i).getName());
+                    }
+
+
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(Checkout.this,
+                        android.R.layout.simple_list_item_1, list);
+
+                addr.setAdapter(adapter);
+
+
+
+                progress.setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onFailure(Call<addressBean> call, Throwable t) {
+                progress.setVisibility(View.GONE);
+            }
+        });
+
+        addr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (position > 0)
+                {
+
+
+                    isnew = "0";
+                    Datum item = adlist.get(position - 1);
+                    name.setText(item.getName());
+                    address.setText(item.getHouse());
+                    area.setText(item.getArea());
+                    city.setText(item.getCity());
+                    pin.setText(item.getPin());
+
+
+                }
+                else
+                {
+                    isnew = "1";
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         slot.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -376,7 +469,12 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                                                             paymode,
                                                             tslot,
                                                             dd,
-                                                            pid
+                                                            pid,
+                                                            a,
+                                                            ar,
+                                                            c,
+                                                            p,
+                                                            isnew
                                                     );
                                                     call.enqueue(new Callback<checkoutBean>() {
                                                         @Override
@@ -529,7 +627,12 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                     "online",
                     tslot,
                     dd,
-                    pid
+                    pid,
+                    a,
+                    ar,
+                    c,
+                    p,
+                    isnew
             );
             call.enqueue(new Callback<checkoutBean>() {
                 @Override
@@ -608,12 +711,18 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
             Log.d("today" , currentTime);
 
             String time1 = "09:30";
-            String time2 = "12:30";
-            String time3 = "16:00";
+            String time2 = "11:30";
+            String time3 = "14:00";
+            String time4 = "16:00";
+            String time5 = "18:00";
+            String time6 = "19:30";
 
             Date date1 = null;
             Date date2 = null;
             Date date3 = null;
+            Date date4 = null;
+            Date date5 = null;
+            Date date6 = null;
             Date cd = null;
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
@@ -640,6 +749,21 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            try {
+                date4 = dateFormat.parse(time4);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            try {
+                date5 = dateFormat.parse(time5);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            try {
+                date6 = dateFormat.parse(time6);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             ts.clear();
             tslot = "";
@@ -647,17 +771,29 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
             if (date1.compareTo(cd) > 0)
             {
-                ts.add("9:30 - 12:30");
+                ts.add("9:30 - 11:30");
             }
 
             if (date2.compareTo(cd) > 0)
             {
-                ts.add("12:30 - 3:30");
+                ts.add("11:30 - 1:30");
             }
 
             if (date3.compareTo(cd) > 0)
             {
-                ts.add("4:00 - 7:00");
+                ts.add("2:00 - 4:00");
+            }
+            if (date4.compareTo(cd) > 0)
+            {
+                ts.add("4:00 - 6:00");
+            }
+            if (date5.compareTo(cd) > 0)
+            {
+                ts.add("6:00 - 7:30");
+            }
+            if (date6.compareTo(cd) > 0)
+            {
+                ts.add("7:30 - 9:00");
             }
             else
             {
@@ -678,9 +814,12 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
             tslot = "";
 
 
-            ts.add("9:30 - 12:30");
-            ts.add("12:30 - 3:30");
-            ts.add("4:00 - 7:00");
+            ts.add("9:30 - 11:30");
+            ts.add("11:30 - 1:30");
+            ts.add("2:00 - 4:00");
+            ts.add("4:00 - 6:00");
+            ts.add("6:00 - 7:30");
+            ts.add("7:30 - 9:00");
 
 
 

@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     List<Cat> list3;
     DrawerLayout drawer;
 
-    TextView login , logout , cart , orders , title , count , location , terms , about , rewards;
+    TextView login , logout , cart , orders , title , count , location , terms , about , rewards , address;
 
     ImageButton cart1;
 
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         terms = findViewById(R.id.terms);
         about = findViewById(R.id.about);
         rewards = findViewById(R.id.rewards);
+        address = findViewById(R.id.address);
 
         setSupportActionBar(toolbar);
 
@@ -285,6 +286,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
+
         final String uid = SharePreferenceUtils.getInstance().getString("userId");
 
         if (uid.length() > 0)
@@ -310,6 +314,26 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
 
+
+            }
+        });
+
+
+        address.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (uid.length() > 0)
+                {
+                    Intent intent = new Intent(MainActivity.this , Address.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
+                }
+
+                drawer.closeDrawer(GravityCompat.START);
 
             }
         });

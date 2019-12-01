@@ -11,7 +11,7 @@
     </style>
 
     <style name="DrawerIconStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/white</item>
+        <item name="color">@color/white2</item>
     </style>
 
     <style name="DialogCustomTheme" parent="android:Theme.Holo.Dialog.NoActionBar">
@@ -19,4 +19,5 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
     </style>
 
+    <color name="white2">#ffffff</color>
 </resources>

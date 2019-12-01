@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
@@ -14,9 +15,14 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.text.Html;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +58,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         object = new JSONObject(remoteMessage.getData());
 
         try {
-            handleNotification(object.getString("message"));
+            handleNotification(object.getString("message") , object.getString("image"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -66,9 +72,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
     }
 
-    private void handleNotification(String message) {
+    private void handleNotification(String message  ,String image) {
 
         Log.d("notificationData", message);
+        Log.d("notificationData", image);
         String idChannel = "southman messages";
         Intent mainIntent;
 
@@ -78,59 +85,114 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationManager mNotificationManager = (NotificationManager) Bean.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-        NotificationChannel mChannel;
+        final NotificationChannel[] mChannel = new NotificationChannel[1];
         // The id of the channel.
 
         int importance = NotificationManager.IMPORTANCE_HIGH;
 
-        NotificationCompat.Builder builder;
+        final NotificationCompat.Builder[] builder = new NotificationCompat.Builder[1];
 
-        if (isAppRunning(this))
+        if (image.length() > 0)
         {
-            builder = new NotificationCompat.Builder(Bean.getContext(), idChannel);
-            builder.setContentTitle(Bean.getContext().getString(R.string.app_name))
-                    .setSmallIcon(R.drawable.loggg)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true)
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                            .bigText(Html.fromHtml(message)))
-                    .setContentText(Html.fromHtml(message));
+            ImageLoader loader = ImageLoader.getInstance();
+            loader.loadImage("https://mrtecks.com/grocery/admin/upload/nimage/" + image, new ImageLoadingListener() {
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
+
+                }
+
+                @Override
+                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    builder[0] = new NotificationCompat.Builder(Bean.getContext(), idChannel);
+                    builder[0].setContentTitle(Bean.getContext().getString(R.string.app_name))
+                            .setSmallIcon(R.drawable.loggg)
+                            .setContentIntent(pendingIntent)
+                            .setContentText(Html.fromHtml(message))
+                            .setAutoCancel(true)
+                            .setStyle(new NotificationCompat.BigPictureStyle()
+                                    .bigPicture(loadedImage).setSummaryText(message))
+                            .setContentText(Html.fromHtml(message));
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        mChannel[0] = new NotificationChannel(idChannel, Bean.getContext().getString(R.string.app_name), importance);
+                        // Configure the notification channel.
+                        mChannel[0].setDescription(Bean.getContext().getString(R.string.alarm_notification));
+                        mChannel[0].enableLights(true);
+                        mChannel[0].setLightColor(Color.RED);
+                        mChannel[0].setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                        if (mNotificationManager != null) {
+                            mNotificationManager.createNotificationChannel(mChannel[0]);
+                        }
+                    } else {
+                        builder[0].setContentTitle(Bean.getContext().getString(R.string.app_name))
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setColor(ContextCompat.getColor(Bean.getContext(), R.color.transparent))
+                                .setVibrate(new long[]{100, 250})
+                                .setLights(Color.YELLOW, 500, 5000)
+                                .setAutoCancel(true);
+                    }
+                    if (mNotificationManager != null) {
+                        mNotificationManager.notify(1, builder[0].build());
+                    }
+
+                }
+
+                @Override
+                public void onLoadingCancelled(String imageUri, View view) {
+
+                }
+            });
+
+
         }
         else
         {
-            builder = new NotificationCompat.Builder(Bean.getContext(), idChannel);
-            builder.setContentTitle(Bean.getContext().getString(R.string.app_name))
+            builder[0] = new NotificationCompat.Builder(Bean.getContext(), idChannel);
+            builder[0].setContentTitle(Bean.getContext().getString(R.string.app_name))
                     .setSmallIcon(R.drawable.loggg)
                     .setContentIntent(pendingIntent)
+                    .setContentText(Html.fromHtml(message))
+                    .setAutoCancel(true)
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(Html.fromHtml(message)))
-                    .setAutoCancel(true)
                     .setContentText(Html.fromHtml(message));
-        }
 
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mChannel = new NotificationChannel(idChannel, Bean.getContext().getString(R.string.app_name), importance);
-            // Configure the notification channel.
-            mChannel.setDescription(Bean.getContext().getString(R.string.alarm_notification));
-            mChannel.enableLights(true);
-            mChannel.setLightColor(Color.RED);
-            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-            if (mNotificationManager != null) {
-                mNotificationManager.createNotificationChannel(mChannel);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mChannel[0] = new NotificationChannel(idChannel, Bean.getContext().getString(R.string.app_name), importance);
+                // Configure the notification channel.
+                mChannel[0].setDescription(Bean.getContext().getString(R.string.alarm_notification));
+                mChannel[0].enableLights(true);
+                mChannel[0].setLightColor(Color.RED);
+                mChannel[0].setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                if (mNotificationManager != null) {
+                    mNotificationManager.createNotificationChannel(mChannel[0]);
+                }
+            } else {
+                builder[0].setContentTitle(Bean.getContext().getString(R.string.app_name))
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setColor(ContextCompat.getColor(Bean.getContext(), R.color.transparent))
+                        .setVibrate(new long[]{100, 250})
+                        .setLights(Color.YELLOW, 500, 5000)
+                        .setAutoCancel(true);
             }
-        } else {
-            builder.setContentTitle(Bean.getContext().getString(R.string.app_name))
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setColor(ContextCompat.getColor(Bean.getContext(), R.color.transparent))
-                    .setVibrate(new long[]{100, 250})
-                    .setLights(Color.YELLOW, 500, 5000)
-                    .setAutoCancel(true);
+            if (mNotificationManager != null) {
+                mNotificationManager.notify(1, builder[0].build());
+            }
+
         }
-        if (mNotificationManager != null) {
-            mNotificationManager.notify(1, builder.build());
-        }
+
+
+
+
+
+
+
 
 
     }
