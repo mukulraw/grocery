@@ -333,6 +333,11 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                 if (pc.length() > 0)
                 {
 
+                    apply.setEnabled(false);
+                    apply.setClickable(false);
+
+                    promo.setEnabled(false);
+                    promo.setClickable(false);
 
                     progress.setVisibility(View.VISIBLE);
 
@@ -380,6 +385,11 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                             else
                             {
                                 Toast.makeText(Checkout.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                apply.setEnabled(true);
+                                apply.setClickable(true);
+
+                                promo.setEnabled(true);
+                                promo.setClickable(true);
                             }
 
                             progress.setVisibility(View.GONE);
@@ -389,6 +399,11 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                         @Override
                         public void onFailure(Call<checkPromoBean> call, Throwable t) {
                             progress.setVisibility(View.GONE);
+                            apply.setEnabled(true);
+                            apply.setClickable(true);
+
+                            promo.setEnabled(true);
+                            promo.setClickable(true);
                         }
                     });
 
@@ -620,7 +635,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
             Call<checkoutBean> call = cr.buyVouchers(
                     SharePreferenceUtils.getInstance().getString("userId"),
-                    amm,
+                    gtotal,
                     oid,
                     n,
                     adr,
