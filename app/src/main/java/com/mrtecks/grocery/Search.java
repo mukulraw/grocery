@@ -1,8 +1,10 @@
 package com.mrtecks.grocery;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,43 +42,33 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class Search extends AppCompatActivity {
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
-    Toolbar toolbar;
+public class Search extends Fragment {
+
     RecyclerView grid;
     ProgressBar progress;
     EditText query;
     List<Datum> list;
     SearchAdapter adapter;
     GridLayoutManager manager;
+    MainActivity2 mainActivity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_search, container, false);
+        mainActivity = (MainActivity2) getActivity();
         list = new ArrayList<>();
 
-        toolbar = findViewById(R.id.toolbar5);
-        grid = findViewById(R.id.grid);
-        progress = findViewById(R.id.progressBar5);
-        query = findViewById(R.id.editText4);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setTitle("Search");
-        toolbar.setNavigationIcon(R.drawable.ic_back);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
 
-        });
+        grid = view.findViewById(R.id.grid);
+        progress = view.findViewById(R.id.progressBar5);
+        query = view.findViewById(R.id.editText4);
 
-        adapter = new SearchAdapter(this , list);
-        manager = new GridLayoutManager(this , 1);
+
+        adapter = new SearchAdapter(mainActivity , list);
+        manager = new GridLayoutManager(mainActivity , 1);
 
         grid.setAdapter(adapter);
         grid.setLayoutManager(manager);
@@ -98,7 +90,7 @@ public class Search extends AppCompatActivity {
 
                     progress.setVisibility(View.VISIBLE);
 
-                    Bean b = (Bean) getApplicationContext();
+                    Bean b = (Bean) mainActivity.getApplicationContext();
 
                     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
                     logging.level(HttpLoggingInterceptor.Level.HEADERS);
@@ -153,6 +145,7 @@ public class Search extends AppCompatActivity {
             }
         });
 
+        return view;
 
     }
 

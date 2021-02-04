@@ -1,26 +1,17 @@
 package com.mrtecks.grocery;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
-
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,16 +19,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
+
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.mrtecks.grocery.cartPOJO.cartBean;
 import com.mrtecks.grocery.homePOJO.Banners;
 import com.mrtecks.grocery.homePOJO.Best;
 import com.mrtecks.grocery.homePOJO.Cat;
@@ -50,8 +53,10 @@ import com.santalu.autoviewpager.AutoViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import me.relex.circleindicator.CircleIndicator;
 import nl.dionsegijn.steppertouch.StepperTouch;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -62,11 +67,16 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+import static android.app.Activity.RESULT_OK;
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
-    Toolbar toolbar;
+public class Home extends Fragment {
+
+    static MainActivity2 mainActivity;
+
+    TextView search;
+
     AutoViewPager pager;
-    Button search, category;
     RecyclerView bestSelling, offerBanners, todayDeals, member, categories;
     TextView readMore;
     ProgressBar progress;
@@ -78,143 +88,108 @@ public class MainActivity extends AppCompatActivity {
     List<Banners> list1;
     List<Member> list2;
     List<Cat> list3;
-    DrawerLayout drawer;
 
-    TextView login, logout, cart, orders, title, count, location, terms, about, rewards, address;
-
-    ImageButton cart1;
-
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.home, container, false);
+        mainActivity = (MainActivity2) getActivity();
 
         list = new ArrayList<>();
         list1 = new ArrayList<>();
         list2 = new ArrayList<>();
         list3 = new ArrayList<>();
 
-        toolbar = findViewById(R.id.toolbar);
-        pager = findViewById(R.id.viewPager);
-        search = findViewById(R.id.button4);
-        category = findViewById(R.id.button3);
-        bestSelling = findViewById(R.id.recyclerView);
-        offerBanners = findViewById(R.id.recyclerView2);
-        todayDeals = findViewById(R.id.recyclerView4);
-        member = findViewById(R.id.recyclerView3);
-        categories = findViewById(R.id.categories);
-        readMore = findViewById(R.id.textView7);
-        progress = findViewById(R.id.progress);
-        login = findViewById(R.id.textView3);
-        logout = findViewById(R.id.logout);
-        cart = findViewById(R.id.cart);
-        orders = findViewById(R.id.orders);
-        title = findViewById(R.id.title);
-        cart1 = findViewById(R.id.imageButton3);
-        count = findViewById(R.id.count);
-        location = findViewById(R.id.home);
-        terms = findViewById(R.id.terms);
-        about = findViewById(R.id.about);
-        rewards = findViewById(R.id.rewards);
-        address = findViewById(R.id.address);
+        pager = view.findViewById(R.id.viewPager);
+        search = view.findViewById(R.id.textView51);
+        bestSelling = view.findViewById(R.id.recyclerView);
+        offerBanners = view.findViewById(R.id.recyclerView2);
+        todayDeals = view.findViewById(R.id.recyclerView4);
+        member = view.findViewById(R.id.recyclerView3);
+        categories = view.findViewById(R.id.categories);
+        readMore = view.findViewById(R.id.textView7);
 
-        setSupportActionBar(toolbar);
+        progress = view.findViewById(R.id.progressBar2);
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        drawer = findViewById(R.id.drawer);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-
-        final String loc = SharePreferenceUtils.getInstance().getString("location");
-
-        if (loc.length() > 0) {
-            title.setText(loc);
-            location.setText(loc);
-        } else {
-            title.setText("Agartala");
-            location.setText("Agartala");
-            SharePreferenceUtils.getInstance().saveString("location", "Agartala");
-        }
-
-
-        title.setOnClickListener(new View.OnClickListener() {
+        search.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
 
-
-                Dialog dialog = new Dialog(MainActivity.this);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setCancelable(true);
-                dialog.setContentView(R.layout.location_dialog);
-                dialog.show();
-
-                RecyclerView grid = dialog.findViewById(R.id.grid);
-                List<String> locs = new ArrayList<>();
-
-                GridLayoutManager manager = new GridLayoutManager(MainActivity.this, 1);
-
-                locs.add("Agartala");
-                locs.add("Udaipur");
-                locs.add("Silchar");
-                locs.add("Guwahati");
-                locs.add("Kolkata");
-
-                LocationAdapter adapter = new LocationAdapter(MainActivity.this, locs, dialog);
-
-                grid.setAdapter(adapter);
-                grid.setLayoutManager(manager);
+                mainActivity.navigation.setSelectedItemId(R.id.action_blog);
 
             }
         });
 
-        location.setOnClickListener(new View.OnClickListener() {
+
+        /*list = new ArrayList<>();
+        blist = new ArrayList<>();
+        bannersList = new ArrayList<>();
+
+        banners = view.findViewById(R.id.viewPager);
+        indicator = view.findViewById(R.id.indicator);
+        categories = view.findViewById(R.id.recyclerView);
+        best = view.findViewById(R.id.recyclerView2);
+        progress = view.findViewById(R.id.progressBar2);
+        banner1 = view.findViewById(R.id.imageView3);
+        obanners = view.findViewById(R.id.imageView4);
+
+
+        categoryAdapter = new CategoryAdapter(mainActivity, list);
+        bestAdapter = new BestAdapter(mainActivity, blist);
+        manager = new GridLayoutManager(mainActivity, 2);
+        manager2 = new LinearLayoutManager(mainActivity, LinearLayoutManager.HORIZONTAL, false);
+
+        offerAdapter = new OfferAdapter(mainActivity, bannersList);
+        GridLayoutManager manager22 = new GridLayoutManager(mainActivity, 1);
+        obanners.setAdapter(offerAdapter);
+        obanners.setLayoutManager(manager22);
+
+        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
-            public void onClick(View v) {
-
-
-                drawer.closeDrawer(GravityCompat.START);
-
-
-                Dialog dialog = new Dialog(MainActivity.this);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setCancelable(true);
-                dialog.setContentView(R.layout.location_dialog);
-                dialog.show();
-
-                RecyclerView grid = dialog.findViewById(R.id.grid);
-                List<String> locs = new ArrayList<>();
-
-                GridLayoutManager manager = new GridLayoutManager(MainActivity.this, 1);
-
-                locs.add("Agartala");
-                locs.add("Udaipur");
-                locs.add("Silchar");
-                locs.add("Guwahati");
-                locs.add("Kolkata");
-
-                LocationAdapter adapter = new LocationAdapter(MainActivity.this, locs, dialog);
-
-                grid.setAdapter(adapter);
-                grid.setLayoutManager(manager);
-
+            public int getSpanSize(int position) {
+                return categoryAdapter.getSpans(position);
             }
         });
 
-        adapter2 = new BestAdapter(this, list);
-        adapter3 = new BestAdapter(this, list);
-        adapter4 = new OfferAdapter(this, list1);
-        adapter5 = new MemberAdapter(this, list2);
-        adapter6 = new CategoryAdapter(this, list3);
+        categories.setAdapter(categoryAdapter);
+        categories.setLayoutManager(manager);
 
-        LinearLayoutManager manager1 = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
-        LinearLayoutManager manager2 = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
-        LinearLayoutManager manager3 = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
-        LinearLayoutManager manager4 = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
-        LinearLayoutManager manager5 = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
+        best.setAdapter(bestAdapter);
+        best.setLayoutManager(manager2);
+
+        *//*search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                FragmentManager fm4 = mainActivity.getSupportFragmentManager();
+
+                FragmentTransaction ft4 = fm4.beginTransaction();
+                Search frag14 = new Search();
+                ft4.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    *//**//*Bundle b = new Bundle();
+                    b.putString("id", item.getId());
+                    b.putString("title", item.getName());
+                    frag14.setArguments(b);*//**//*
+                ft4.replace(R.id.replace, frag14);
+                //ft4.addToBackStack(null);
+                ft4.commit();
+
+            }
+        });*//*
+
+        createLocationRequest();*/
+
+        adapter2 = new BestAdapter(mainActivity, list);
+        adapter3 = new BestAdapter(mainActivity, list);
+        adapter4 = new OfferAdapter(mainActivity, list1);
+        adapter5 = new MemberAdapter(mainActivity, list2);
+        adapter6 = new CategoryAdapter(mainActivity, list3);
+
+        LinearLayoutManager manager1 = new LinearLayoutManager(mainActivity, RecyclerView.HORIZONTAL, false);
+        LinearLayoutManager manager2 = new LinearLayoutManager(mainActivity, RecyclerView.HORIZONTAL, false);
+        LinearLayoutManager manager3 = new LinearLayoutManager(mainActivity, RecyclerView.VERTICAL, false);
+        LinearLayoutManager manager4 = new LinearLayoutManager(mainActivity, RecyclerView.HORIZONTAL, false);
+        LinearLayoutManager manager5 = new LinearLayoutManager(mainActivity, RecyclerView.VERTICAL, false);
 
         bestSelling.setAdapter(adapter2);
         bestSelling.setLayoutManager(manager1);
@@ -232,57 +207,9 @@ public class MainActivity extends AppCompatActivity {
         categories.setLayoutManager(manager5);
 
 
-        terms.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent intent = new Intent(MainActivity.this, Web.class);
-                intent.putExtra("title", "Terms & Conditions");
-                intent.putExtra("url", "https://mrtecks.com/grocery/terms.php");
-                startActivity(intent);
-                drawer.closeDrawer(GravityCompat.START);
-
-            }
-        });
-
-        about.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent intent = new Intent(MainActivity.this, Web.class);
-                intent.putExtra("title", "About Us");
-                intent.putExtra("url", "https://mrtecks.com/grocery/about.php");
-                startActivity(intent);
-                drawer.closeDrawer(GravityCompat.START);
-
-            }
-        });
-
-
-        category.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(MainActivity.this, Category.class);
-                startActivity(intent);
-
-            }
-        });
-
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(MainActivity.this, Search.class);
-                startActivity(intent);
-
-            }
-        });
-
-
         final String uid = SharePreferenceUtils.getInstance().getString("userId");
 
-        if (uid.length() > 0) {
+        /*if (uid.length() > 0) {
             login.setText(SharePreferenceUtils.getInstance().getString("phone"));
             rewards.setText("REWARD POINTS - " + SharePreferenceUtils.getInstance().getString("rewards"));
             rewards.setVisibility(View.VISIBLE);
@@ -291,111 +218,21 @@ public class MainActivity extends AppCompatActivity {
             rewards.setVisibility(View.GONE);
         }
 
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        */
 
-
-                if (uid.length() == 0) {
-                    Intent intent = new Intent(MainActivity.this, Login.class);
-                    startActivity(intent);
-                }
-
-
-            }
-        });
-
-
-        address.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (uid.length() > 0) {
-                    Intent intent = new Intent(MainActivity.this, Address.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
-                }
-
-                drawer.closeDrawer(GravityCompat.START);
-
-            }
-        });
-
-
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                SharePreferenceUtils.getInstance().deletePref();
-
-                Intent intent = new Intent(MainActivity.this, Spalsh.class);
-                startActivity(intent);
-                finishAffinity();
-
-            }
-        });
-
-        cart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (uid.length() > 0) {
-                    Intent intent = new Intent(MainActivity.this, Cart.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
-                }
-
-                drawer.closeDrawer(GravityCompat.START);
-
-            }
-        });
-
-        cart1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (uid.length() > 0) {
-                    Intent intent = new Intent(MainActivity.this, Cart.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
-                }
-
-                drawer.closeDrawer(GravityCompat.START);
-
-            }
-        });
-
-        orders.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (uid.length() > 0) {
-                    Intent intent = new Intent(MainActivity.this, Orders.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "Please login to continue", Toast.LENGTH_SHORT).show();
-                }
-
-                drawer.closeDrawer(GravityCompat.START);
-
-            }
-        });
-
-        AppUpdater appUpdater = new AppUpdater(this);
+        AppUpdater appUpdater = new AppUpdater(mainActivity);
         appUpdater.setDisplay(Display.NOTIFICATION);
         appUpdater.start();
 
+        return view;
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         progress.setVisibility(View.VISIBLE);
 
-        Bean b = (Bean) getApplicationContext();
+        Bean b = (Bean) mainActivity.getApplicationContext();
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.level(HttpLoggingInterceptor.Level.HEADERS);
@@ -421,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
                 if (response.body().getStatus().equals("1")) {
 
 
-                    BannerAdapter adapter1 = new BannerAdapter(getSupportFragmentManager(), response.body().getPbanner());
+                    BannerAdapter adapter1 = new BannerAdapter(getChildFragmentManager(), response.body().getPbanner());
                     pager.setAdapter(adapter1);
 
                     adapter2.setData(response.body().getBest());
@@ -443,66 +280,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        loadCart();
-
-
     }
 
-    void loadCart() {
-        String uid = SharePreferenceUtils.getInstance().getString("userId");
-
-        if (uid.length() > 0) {
-            Bean b = (Bean) getApplicationContext();
-
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.level(HttpLoggingInterceptor.Level.HEADERS);
-            logging.level(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(b.baseurl)
-                    .client(client)
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
-
-            Call<cartBean> call2 = cr.getCart(SharePreferenceUtils.getInstance().getString("userId"));
-            call2.enqueue(new Callback<cartBean>() {
-                @Override
-                public void onResponse(Call<cartBean> call, Response<cartBean> response) {
-
-                    if (response.body().getData().size() > 0) {
-
-
-                        count.setText(String.valueOf(response.body().getData().size()));
-
-
-                    } else {
-
-                        count.setText("0");
-
-                    }
-
-                    progress.setVisibility(View.GONE);
-
-                }
-
-                @Override
-                public void onFailure(Call<cartBean> call, Throwable t) {
-                    progress.setVisibility(View.GONE);
-                }
-            });
-
-            getRew();
-
-        } else {
-            count.setText("0");
-        }
-    }
 
     class BannerAdapter extends FragmentStatePagerAdapter {
 
@@ -515,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            page frag = new page();
+            MainActivity.page frag = new MainActivity.page();
             frag.setData(blist.get(position).getImage(), blist.get(position).getCname(), blist.get(position).getCid());
             return frag;
         }
@@ -679,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 progressBar.setVisibility(View.VISIBLE);
 
-                                Bean b = (Bean) getApplicationContext();
+                                Bean b = (Bean) mainActivity.getApplicationContext();
 
 
                                 HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -713,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
                                         if (response.body().getStatus().equals("1")) {
                                             //loadCart();
                                             dialog.dismiss();
-                                            loadCart();
+                                            //loadCart();
                                         }
 
                                         Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
@@ -990,8 +769,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View view) {
 
                     SharePreferenceUtils.getInstance().saveString("location", item);
-                    title.setText(item);
-                    location.setText(item);
+                    //title.setText(item);
+                    //location.setText(item);
                     dialog.dismiss();
 
                 }
@@ -1018,45 +797,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void getRew() {
-
-        progress.setVisibility(View.VISIBLE);
-
-        Bean b = (Bean) getApplicationContext();
-
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.level(HttpLoggingInterceptor.Level.HEADERS);
-        logging.level(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(b.baseurl)
-                .client(client)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
-
-        Call<String> call = cr.getRew(SharePreferenceUtils.getInstance().getString("user_id"));
-
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-
-                rewards.setText("REWARD POINTS - " + response.body());
-
-                progress.setVisibility(View.GONE);
-
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                progress.setVisibility(View.GONE);
-            }
-        });
-
-    }
 
 }
