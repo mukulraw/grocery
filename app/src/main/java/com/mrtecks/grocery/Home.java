@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
@@ -45,6 +47,7 @@ import com.mrtecks.grocery.homePOJO.Banners;
 import com.mrtecks.grocery.homePOJO.Best;
 import com.mrtecks.grocery.homePOJO.Cat;
 import com.mrtecks.grocery.homePOJO.Member;
+import com.mrtecks.grocery.homePOJO.Subcat;
 import com.mrtecks.grocery.homePOJO.homeBean;
 import com.mrtecks.grocery.seingleProductPOJO.singleProductBean;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -75,6 +78,7 @@ public class Home extends Fragment {
     static MainActivity2 mainActivity;
 
     TextView search;
+    CircleIndicator indicator;
 
     AutoViewPager pager;
     RecyclerView bestSelling, offerBanners, todayDeals, member, categories;
@@ -108,6 +112,7 @@ public class Home extends Fragment {
         member = view.findViewById(R.id.recyclerView3);
         categories = view.findViewById(R.id.categories);
         readMore = view.findViewById(R.id.textView7);
+        indicator = view.findViewById(R.id.indicator);
 
         progress = view.findViewById(R.id.progressBar2);
 
@@ -189,7 +194,7 @@ public class Home extends Fragment {
         LinearLayoutManager manager2 = new LinearLayoutManager(mainActivity, RecyclerView.HORIZONTAL, false);
         LinearLayoutManager manager3 = new LinearLayoutManager(mainActivity, RecyclerView.VERTICAL, false);
         LinearLayoutManager manager4 = new LinearLayoutManager(mainActivity, RecyclerView.HORIZONTAL, false);
-        LinearLayoutManager manager5 = new LinearLayoutManager(mainActivity, RecyclerView.VERTICAL, false);
+        GridLayoutManager manager5 = new GridLayoutManager(mainActivity, 1);
 
         bestSelling.setAdapter(adapter2);
         bestSelling.setLayoutManager(manager1);
@@ -260,6 +265,7 @@ public class Home extends Fragment {
 
                     BannerAdapter adapter1 = new BannerAdapter(getChildFragmentManager(), response.body().getPbanner());
                     pager.setAdapter(adapter1);
+                    indicator.setViewPager(pager);
 
                     adapter2.setData(response.body().getBest());
                     adapter3.setData(response.body().getToday());
@@ -404,13 +410,17 @@ public class Home extends Fragment {
                 nv1 = String.valueOf(nv);
 
                 holder.discount.setVisibility(View.VISIBLE);
+                holder.disc.setVisibility(View.VISIBLE);
                 holder.discount.setText(item.getDiscount() + "% OFF");
-                holder.price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(nv) + " </b></font><strike>\u20B9 " + item.getPrice() + "</strike>"));
+                //holder.price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(nv) + " </b></font><strike>\u20B9 " + item.getPrice() + "</strike>"));
+                holder.price.setText(Html.fromHtml("<font><b>\u20B9 " + String.valueOf(nv) + " </b></font>"));
+                holder.disc.setText(Html.fromHtml("<strike>\u20B9 " + item.getPrice() + "</strike>"));
             } else {
 
                 nv1 = item.getPrice();
                 holder.discount.setVisibility(View.GONE);
-                holder.price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(item.getPrice()) + " </b></font>"));
+                holder.disc.setVisibility(View.GONE);
+                holder.price.setText(Html.fromHtml("<font><b>\u20B9 " + String.valueOf(item.getPrice()) + " </b></font>"));
             }
 
 
@@ -531,7 +541,7 @@ public class Home extends Fragment {
         class ViewHolder extends RecyclerView.ViewHolder {
 
             ImageView image;
-            TextView price, title, discount, stock;
+            TextView price, title, discount, stock, disc;
             Button add;
 
             public ViewHolder(@NonNull View itemView) {
@@ -543,6 +553,7 @@ public class Home extends Fragment {
                 discount = itemView.findViewById(R.id.textView10);
                 add = itemView.findViewById(R.id.button5);
                 stock = itemView.findViewById(R.id.textView63);
+                disc = itemView.findViewById(R.id.textView67);
 
 
             }
@@ -685,6 +696,8 @@ public class Home extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
+            holder.setIsRecyclable(false);
+
             final Cat item = list.get(position);
 
 
@@ -692,10 +705,40 @@ public class Home extends Fragment {
             ImageLoader loader = ImageLoader.getInstance();
             loader.displayImage(item.getImage(), holder.image, options);
 
-            holder.tag.setText(item.getTag());
+            //holder.tag.setText(item.getTag());
             holder.title.setText(item.getName());
             holder.desc.setText(item.getDescription());
 
+            SubCategoryAdapter adapter = new SubCategoryAdapter(context, item.getSubcat());
+            GridLayoutManager manager = new GridLayoutManager(context, 3);
+            holder.gridl.setAdapter(adapter);
+            holder.gridl.setLayoutManager(manager);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    if (holder.hide.getVisibility() == View.VISIBLE) {
+                        holder.hide.setVisibility(View.GONE);
+                        holder.main.setCardBackgroundColor(Color.parseColor("#ffffff"));
+                    } else {
+                        holder.hide.setVisibility(View.VISIBLE);
+                        holder.main.setCardBackgroundColor(Color.parseColor("#FFF3E0"));
+
+                        categories.smoothScrollToPosition(position);
+
+                    }
+
+                    /*Intent intent = new Intent(context, SubCat.class);
+                    intent.putExtra("id", item.getId());
+                    intent.putExtra("title", item.getName());
+                    intent.putExtra("image", item.getImage());
+                    context.startActivity(intent);*/
+
+                }
+            });
+
+/*
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -707,6 +750,7 @@ public class Home extends Fragment {
 
                 }
             });
+*/
 
         }
 
@@ -719,14 +763,107 @@ public class Home extends Fragment {
 
             ImageView image;
             TextView tag, title, desc;
+            RecyclerView gridl;
+            CardView hide, main;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 image = itemView.findViewById(R.id.imageView5);
-                tag = itemView.findViewById(R.id.textView17);
+                //tag = itemView.findViewById(R.id.textView17);
                 title = itemView.findViewById(R.id.textView18);
-                desc = itemView.findViewById(R.id.textView19);
+                desc = itemView.findViewById(R.id.textView5);
+                gridl = itemView.findViewById(R.id.secondgrid);
+                hide = itemView.findViewById(R.id.grid);
+                main = itemView.findViewById(R.id.linearLayout3);
+
+
+            }
+        }
+    }
+
+
+    class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.ViewHolder> {
+
+        Context context;
+        List<Subcat> list = new ArrayList<>();
+
+        public SubCategoryAdapter(Context context, List<Subcat> list) {
+            this.context = context;
+            this.list = list;
+        }
+
+        /*public void setData(List<Datum> list)
+        {
+            mainActivity.list = list;
+            notifyDataSetChanged();
+        }
+*/
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.sub_category_list_model, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+            final Subcat item = list.get(position);
+
+
+            DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).resetViewBeforeLoading(false).build();
+            ImageLoader loader = ImageLoader.getInstance();
+            loader.displayImage(item.getImage(), holder.image, options);
+
+
+            holder.title.setText(item.getName());
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent intent = new Intent(context , Products.class);
+                    intent.putExtra("id" , item.getId());
+                    intent.putExtra("title" , item.getName());
+                    context.startActivity(intent);
+
+                    /*FragmentManager fm4 = mainActivity.getSupportFragmentManager();
+
+                    FragmentTransaction ft4 = fm4.beginTransaction();
+                    Products frag14 = new Products();
+                    Bundle b = new Bundle();
+                    b.putString("id", item.getId());
+                    b.putString("title", item.getName());
+                    frag14.setArguments(b);
+                    ft4.replace(R.id.replace, frag14);
+                    ft4.addToBackStack(null);
+                    ft4.commit();*/
+
+
+                }
+            });
+
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+
+            ImageView image;
+            TextView title;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+
+                image = itemView.findViewById(R.id.imageView4);
+
+                title = itemView.findViewById(R.id.textView11);
 
 
             }

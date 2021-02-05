@@ -3,6 +3,8 @@ package com.mrtecks.grocery.homePOJO;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Cat {
     @SerializedName("id")
     @Expose
@@ -13,12 +15,18 @@ public class Cat {
     @SerializedName("image")
     @Expose
     private String image;
+    @SerializedName("space")
+    @Expose
+    private Object space;
     @SerializedName("description")
     @Expose
     private String description;
     @SerializedName("tag")
     @Expose
     private String tag;
+    @SerializedName("subcat")
+    @Expose
+    private List<Subcat> subcat = null;
 
     public String getId() {
         return id;
@@ -44,6 +52,14 @@ public class Cat {
         this.image = image;
     }
 
+    public Object getSpace() {
+        return space;
+    }
+
+    public void setSpace(Object space) {
+        this.space = space;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -58,5 +74,13 @@ public class Cat {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public List<Subcat> getSubcat() {
+        return subcat;
+    }
+
+    public void setSubcat(List<Subcat> subcat) {
+        this.subcat = subcat;
     }
 }
