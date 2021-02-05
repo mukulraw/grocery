@@ -33,12 +33,6 @@
             android:name=".Checkout"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Cart"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".SingleProduct"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".SubCat"
             android:screenOrientation="portrait" />
         <activity

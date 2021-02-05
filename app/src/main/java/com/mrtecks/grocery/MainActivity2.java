@@ -49,6 +49,8 @@ public class MainActivity2 extends AppCompatActivity {
 
     TextView address, orders, cart1, contact, logout, name;
 
+    ImageView clickhome;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +66,7 @@ public class MainActivity2 extends AppCompatActivity {
         contact = findViewById(R.id.textView22);
         logout = findViewById(R.id.textView26);
         name = findViewById(R.id.textView17);
+        clickhome = findViewById(R.id.textView);
 
         setSupportActionBar(toolbar);
 
@@ -154,13 +157,13 @@ public class MainActivity2 extends AppCompatActivity {
                             fm3.popBackStack();
                         }
 
-                        /*FragmentTransaction ft3 = fm3.beginTransaction();
+                        FragmentTransaction ft3 = fm3.beginTransaction();
                         ft3.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                         Cart frag13 = new Cart();
                         ft3.replace(R.id.replace, frag13);
                         //ft.addToBackStack(null);
                         ft3.commit();
-                        drawer.closeDrawer(GravityCompat.START);*/
+                        drawer.closeDrawer(GravityCompat.START);
                         break;
                     case R.id.action_orders:
                         FragmentManager fm31 = getSupportFragmentManager();
@@ -179,6 +182,15 @@ public class MainActivity2 extends AppCompatActivity {
                         break;
                 }
                 return true;
+            }
+        });
+
+        clickhome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                navigation.setSelectedItemId(R.id.action_home);
+
             }
         });
 

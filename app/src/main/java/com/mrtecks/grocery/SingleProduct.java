@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -52,7 +53,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class SingleProduct extends AppCompatActivity {
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+
+public class SingleProduct extends Fragment {
 
     Toolbar toolbar;
     ViewPager image;
@@ -75,63 +78,47 @@ public class SingleProduct extends AppCompatActivity {
 
     ImageButton wishlist;
 
-    ImageButton cart1;
-    TextView count;
+    MainActivity2 mainActivity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_product);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_single_product, container, false);
+        mainActivity = (MainActivity2) getActivity();
         list = new ArrayList<>();
 
-        id = getIntent().getStringExtra("id");
-        name = getIntent().getStringExtra("title");
+        id = getArguments().getString("id");
+        name = getArguments().getString("title");
 
-        loved = findViewById(R.id.loved);
-        count = findViewById(R.id.count);
-        cart1 = findViewById(R.id.imageButton3);
-        wishlist = findViewById(R.id.wishlist);
-        recent = findViewById(R.id.recent);
-        toolbar = findViewById(R.id.toolbar);
-        descriptiontitle = findViewById(R.id.descriptiontitle);
-        key_featurestitle = findViewById(R.id.key_featurestitle);
-        packagingtitle = findViewById(R.id.packagingtitle);
-        lifetitle = findViewById(R.id.lifetitle);
-        indicator = findViewById(R.id.indicator);
-        image = findViewById(R.id.image);
-        discount = findViewById(R.id.discount);
-        title = findViewById(R.id.title);
-        price = findViewById(R.id.price);
-        add = findViewById(R.id.add);
-        brand = findViewById(R.id.brand);
-        unit = findViewById(R.id.unit);
-        seller = findViewById(R.id.seller);
-        description = findViewById(R.id.description);
-        key_features = findViewById(R.id.key_features);
-        packaging = findViewById(R.id.packaging);
-        life = findViewById(R.id.life);
-        disclaimer = findViewById(R.id.disclaimer);
-        progress = findViewById(R.id.progress);
-        stock = findViewById(R.id.stock);
+        loved = view.findViewById(R.id.loved);
+        wishlist = view.findViewById(R.id.wishlist);
+        recent = view.findViewById(R.id.recent);
+        toolbar = view.findViewById(R.id.toolbar);
+        descriptiontitle = view.findViewById(R.id.descriptiontitle);
+        key_featurestitle = view.findViewById(R.id.key_featurestitle);
+        packagingtitle = view.findViewById(R.id.packagingtitle);
+        lifetitle = view.findViewById(R.id.lifetitle);
+        indicator = view.findViewById(R.id.indicator);
+        image = view.findViewById(R.id.image);
+        discount = view.findViewById(R.id.discount);
+        title = view.findViewById(R.id.title);
+        price = view.findViewById(R.id.price);
+        add = view.findViewById(R.id.add);
+        brand = view.findViewById(R.id.brand);
+        unit = view.findViewById(R.id.unit);
+        seller = view.findViewById(R.id.seller);
+        description = view.findViewById(R.id.description);
+        key_features = view.findViewById(R.id.key_features);
+        packaging = view.findViewById(R.id.packaging);
+        life = view.findViewById(R.id.life);
+        disclaimer = view.findViewById(R.id.disclaimer);
+        progress = view.findViewById(R.id.progress);
+        stock = view.findViewById(R.id.stock);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setTitle(name);
-        toolbar.setNavigationIcon(R.drawable.ic_back);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
 
-        });
-
-        adapter2 = new BestAdapter(this, list);
-        adapter3 = new BestAdapter(this, list);
-        LinearLayoutManager manager1 = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
-        LinearLayoutManager manager2 = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
+        adapter2 = new BestAdapter(mainActivity, list);
+        adapter3 = new BestAdapter(mainActivity, list);
+        LinearLayoutManager manager1 = new LinearLayoutManager(mainActivity, RecyclerView.HORIZONTAL, false);
+        LinearLayoutManager manager2 = new LinearLayoutManager(mainActivity, RecyclerView.HORIZONTAL, false);
 
         recent.setAdapter(adapter2);
         recent.setLayoutManager(manager1);
@@ -190,23 +177,20 @@ public class SingleProduct extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                if (pid.length() > 0)
-                {
+                if (pid.length() > 0) {
                     String uid = SharePreferenceUtils.getInstance().getString("userId");
 
-                    if (uid.length() > 0)
-                    {
+                    if (uid.length() > 0) {
 
-                        final Dialog dialog = new Dialog(SingleProduct.this);
+                        final Dialog dialog = new Dialog(mainActivity);
                         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         dialog.setCancelable(true);
                         dialog.setContentView(R.layout.add_cart_dialog);
                         dialog.show();
 
-                        final StepperTouch stepperTouch  = dialog.findViewById(R.id.stepperTouch);
+                        final StepperTouch stepperTouch = dialog.findViewById(R.id.stepperTouch);
                         Button add = dialog.findViewById(R.id.button8);
                         final ProgressBar progressBar = dialog.findViewById(R.id.progressBar2);
-
 
 
                         stepperTouch.setMinValue(1);
@@ -220,7 +204,7 @@ public class SingleProduct extends AppCompatActivity {
 
                                 progressBar.setVisibility(View.VISIBLE);
 
-                                Bean b = (Bean) getApplicationContext();
+                                Bean b = (Bean) mainActivity.getApplicationContext();
 
 
                                 HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -237,28 +221,27 @@ public class SingleProduct extends AppCompatActivity {
                                         .build();
                                 AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
 
-                                Log.d("userid" , SharePreferenceUtils.getInstance().getString("userid"));
-                                Log.d("pid" , pid);
-                                Log.d("quantity" , String.valueOf(stepperTouch.getCount()));
-                                Log.d("price" , nv1);
+                                Log.d("userid", SharePreferenceUtils.getInstance().getString("userid"));
+                                Log.d("pid", pid);
+                                Log.d("quantity", String.valueOf(stepperTouch.getCount()));
+                                Log.d("price", nv1);
 
                                 int versionCode = BuildConfig.VERSION_CODE;
                                 String versionName = BuildConfig.VERSION_NAME;
 
-                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userId") , pid , String.valueOf(stepperTouch.getCount()), nv1 , versionName);
+                                Call<singleProductBean> call = cr.addCart(SharePreferenceUtils.getInstance().getString("userId"), pid, String.valueOf(stepperTouch.getCount()), nv1, versionName);
 
                                 call.enqueue(new Callback<singleProductBean>() {
                                     @Override
                                     public void onResponse(Call<singleProductBean> call, Response<singleProductBean> response) {
 
-                                        if (response.body().getStatus().equals("1"))
-                                        {
+                                        if (response.body().getStatus().equals("1")) {
                                             //loadCart();
                                             dialog.dismiss();
-                                            loadCart();
+                                            mainActivity.loadCart();
                                         }
 
-                                        Toast.makeText(SingleProduct.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(mainActivity, response.body().getMessage(), Toast.LENGTH_SHORT).show();
 
                                         progressBar.setVisibility(View.GONE);
 
@@ -274,95 +257,31 @@ public class SingleProduct extends AppCompatActivity {
                             }
                         });
 
-                    }
-                    else
-                    {
-                        Toast.makeText(SingleProduct.this, "Please login to continue", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(SingleProduct.this , Login.class);
+                    } else {
+                        Toast.makeText(mainActivity, "Please login to continue", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(mainActivity, Login.class);
                         startActivity(intent);
 
                     }
                 }
 
 
-
-            }
-        });
-
-        cart1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(SingleProduct.this, Cart.class);
-                startActivity(intent);
-
-
             }
         });
 
 
+
+        return view;
     }
 
-    void loadCart() {
-        String uid = SharePreferenceUtils.getInstance().getString("userId");
-
-        if (uid.length() > 0) {
-            Bean b = (Bean) getApplicationContext();
-
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.level(HttpLoggingInterceptor.Level.HEADERS);
-            logging.level(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(b.baseurl)
-                    .client(client)
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
-
-            Call<cartBean> call2 = cr.getCart(SharePreferenceUtils.getInstance().getString("userId"));
-            call2.enqueue(new Callback<cartBean>() {
-                @Override
-                public void onResponse(Call<cartBean> call, Response<cartBean> response) {
-
-                    if (response.body().getData().size() > 0) {
-
-
-                        count.setText(String.valueOf(response.body().getData().size()));
-
-
-                    } else {
-
-                        count.setText("0");
-
-                    }
-
-
-                }
-
-                @Override
-                public void onFailure(Call<cartBean> call, Throwable t) {
-
-                }
-            });
-
-
-        } else {
-            count.setText("0");
-        }
-    }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
 
         progress.setVisibility(View.VISIBLE);
 
-        Bean b = (Bean) getApplicationContext();
+        Bean b = (Bean) mainActivity.getApplicationContext();
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.level(HttpLoggingInterceptor.Level.HEADERS);
@@ -385,23 +304,21 @@ public class SingleProduct extends AppCompatActivity {
             public void onResponse(Call<singleProductBean> call, Response<singleProductBean> response) {
 
 
-                if (response.body().getStatus().equals("1"))
-                {
+                if (response.body().getStatus().equals("1")) {
                     Data item = response.body().getData();
 
                     pid = item.getId();
 
-                    BannerAdapter adapter = new BannerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, item.getImage());
+                    BannerAdapter adapter = new BannerAdapter(getChildFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, item.getImage());
                     image.setAdapter(adapter);
                     indicator.setViewPager(image);
 
                     float dis = Float.parseFloat(item.getDiscount());
 
-                    if (dis > 0)
-                    {
+                    if (dis > 0) {
 
                         float pri = Float.parseFloat(item.getPrice());
-                        float dv = (dis / 100 ) * pri;
+                        float dv = (dis / 100) * pri;
 
                         float nv = pri - dv;
 
@@ -410,9 +327,7 @@ public class SingleProduct extends AppCompatActivity {
                         discount.setVisibility(View.VISIBLE);
                         discount.setText(item.getDiscount() + "% OFF");
                         price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(nv) + " </b></font><strike>\u20B9 " + item.getPrice() + "</strike>"));
-                    }
-                    else
-                    {
+                    } else {
 
                         nv1 = item.getPrice();
                         discount.setVisibility(View.GONE);
@@ -433,18 +348,13 @@ public class SingleProduct extends AppCompatActivity {
                     disclaimer.setText(item.getDisclaimer());
 
 
-
-                    if (item.getStock().equals("In stock"))
-                    {
+                    if (item.getStock().equals("In stock")) {
                         add.setEnabled(true);
-                    }
-                    else
-                    {
+                    } else {
                         add.setEnabled(false);
                     }
 
                     stock.setText(item.getStock());
-
 
 
                 }
@@ -483,8 +393,6 @@ public class SingleProduct extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
             }
         });
-
-        loadCart();
 
     }
 
@@ -619,10 +527,17 @@ public class SingleProduct extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
 
-                    Intent intent = new Intent(context, SingleProduct.class);
-                    intent.putExtra("id", item.getId());
-                    intent.putExtra("title", item.getName());
-                    context.startActivity(intent);
+                    FragmentManager fm4 = mainActivity.getSupportFragmentManager();
+
+                    FragmentTransaction ft4 = fm4.beginTransaction();
+                    SingleProduct frag14 = new SingleProduct();
+                    Bundle b = new Bundle();
+                    b.putString("id", item.getId());
+                    b.putString("title", item.getName());
+                    frag14.setArguments(b);
+                    ft4.replace(R.id.replace, frag14);
+                    ft4.addToBackStack(null);
+                    ft4.commit();
 
                 }
             });
@@ -657,7 +572,7 @@ public class SingleProduct extends AppCompatActivity {
 
                                 progressBar.setVisibility(View.VISIBLE);
 
-                                Bean b = (Bean) getApplicationContext();
+                                Bean b = (Bean) context.getApplicationContext();
 
 
                                 HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -691,7 +606,7 @@ public class SingleProduct extends AppCompatActivity {
                                         if (response.body().getStatus().equals("1")) {
                                             //loadCart();
                                             dialog.dismiss();
-                                            loadCart();
+                                            mainActivity.loadCart();
                                         }
 
                                         Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
