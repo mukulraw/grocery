@@ -3,6 +3,8 @@ package com.mrtecks.grocery.seingleProductPOJO;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Data {
     @SerializedName("id")
     @Expose
@@ -36,7 +38,7 @@ public class Data {
     private String description;
     @SerializedName("image")
     @Expose
-    private String image;
+    private List<String> image = null;
     @SerializedName("key_features")
     @Expose
     private String keyFeatures;
@@ -58,12 +60,12 @@ public class Data {
     @SerializedName("status")
     @Expose
     private String status;
-    @SerializedName("created")
-    @Expose
-    private String created;
     @SerializedName("stock")
     @Expose
     private String stock;
+    @SerializedName("created")
+    @Expose
+    private String created;
 
     public String getId() {
         return id;
@@ -145,11 +147,11 @@ public class Data {
         this.description = description;
     }
 
-    public String getImage() {
+    public List<String> getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(List<String> image) {
         this.image = image;
     }
 
@@ -209,6 +211,14 @@ public class Data {
         this.status = status;
     }
 
+    public String getStock() {
+        return stock;
+    }
+
+    public void setStock(String stock) {
+        this.stock = stock;
+    }
+
     public String getCreated() {
         return created;
     }
@@ -217,11 +227,4 @@ public class Data {
         this.created = created;
     }
 
-    public String getStock() {
-        return stock;
-    }
-
-    public void setStock(String stock) {
-        this.stock = stock;
-    }
 }

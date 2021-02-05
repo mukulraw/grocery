@@ -158,30 +158,26 @@ public class productList extends Fragment {
 
             DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true).cacheOnDisk(true).resetViewBeforeLoading(false).build();
             ImageLoader loader = ImageLoader.getInstance();
-            loader.displayImage(item.getImage() , holder.image , options);
+            loader.displayImage(item.getImage(), holder.image, options);
 
 
-            if (item.getStock().equals("In stock"))
-            {
+            if (item.getStock().equals("In stock")) {
                 holder.add.setEnabled(true);
-            }
-            else
-            {
+            } else {
                 holder.add.setEnabled(false);
             }
 
             holder.stock.setText(item.getStock());
-
+            holder.size.setText(item.getSize());
 
             float dis = Float.parseFloat(item.getDiscount());
             String nv1 = null;
 
 
-            if (dis > 0)
-            {
+            if (dis > 0) {
 
                 float pri = Float.parseFloat(item.getPrice());
-                float dv = (dis / 100 ) * pri;
+                float dv = (dis / 100) * pri;
 
                 float nv = pri - dv;
 
@@ -189,13 +185,15 @@ public class productList extends Fragment {
 
                 holder.discount.setVisibility(View.VISIBLE);
                 holder.discount.setText(item.getDiscount() + "% OFF");
-                holder.price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(nv) + " </b></font><strike>\u20B9 " + item.getPrice() + "</strike>"));
-            }
-            else
-            {
+                holder.price.setText(Html.fromHtml("\u20B9 " + String.valueOf(nv)));
+                holder.newamount.setText(Html.fromHtml("<strike>\u20B9 " + item.getPrice() + "</strike>"));
+                holder.newamount.setVisibility(View.VISIBLE);
+            } else {
+
                 nv1 = item.getPrice();
                 holder.discount.setVisibility(View.GONE);
-                holder.price.setText(Html.fromHtml("<font color=\"#000000\"><b>\u20B9 " + String.valueOf(item.getPrice()) + " </b></font>"));
+                holder.price.setText("\u20B9 " + item.getPrice());
+                holder.newamount.setVisibility(View.GONE);
             }
 
 
@@ -322,8 +320,9 @@ public class productList extends Fragment {
         {
 
             ImageView image;
-            TextView price , title , discount , stock;
+            TextView price, title, discount, stock, newamount, size;
             Button add;
+
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
@@ -332,7 +331,9 @@ public class productList extends Fragment {
                 title = itemView.findViewById(R.id.textView12);
                 discount = itemView.findViewById(R.id.textView10);
                 add = itemView.findViewById(R.id.button5);
-                stock = itemView.findViewById(R.id.textView64);
+                stock = itemView.findViewById(R.id.textView63);
+                newamount = itemView.findViewById(R.id.textView6);
+                size = itemView.findViewById(R.id.textView7);
 
             }
         }

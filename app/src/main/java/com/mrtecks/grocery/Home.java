@@ -824,12 +824,12 @@ public class Home extends Fragment {
                 @Override
                 public void onClick(View view) {
 
-                    Intent intent = new Intent(context , Products.class);
+                    /*Intent intent = new Intent(context , Products.class);
                     intent.putExtra("id" , item.getId());
                     intent.putExtra("title" , item.getName());
                     context.startActivity(intent);
-
-                    /*FragmentManager fm4 = mainActivity.getSupportFragmentManager();
+*/
+                    FragmentManager fm4 = mainActivity.getSupportFragmentManager();
 
                     FragmentTransaction ft4 = fm4.beginTransaction();
                     Products frag14 = new Products();
@@ -839,7 +839,7 @@ public class Home extends Fragment {
                     frag14.setArguments(b);
                     ft4.replace(R.id.replace, frag14);
                     ft4.addToBackStack(null);
-                    ft4.commit();*/
+                    ft4.commit();
 
 
                 }
