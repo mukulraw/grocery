@@ -27,9 +27,6 @@
             android:name=".Location"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Orders"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".Checkout"
             android:screenOrientation="portrait" />
         <activity

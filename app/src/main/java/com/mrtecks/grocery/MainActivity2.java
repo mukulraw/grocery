@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ShareCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -47,7 +48,7 @@ public class MainActivity2 extends AppCompatActivity {
     ImageView cart;
     TextView count;
 
-    TextView address, orders, cart1, contact, logout, name;
+    TextView address, orders, cart1, contact, logout, name, about, share, terms;
 
     ImageView clickhome;
 
@@ -67,6 +68,9 @@ public class MainActivity2 extends AppCompatActivity {
         logout = findViewById(R.id.textView26);
         name = findViewById(R.id.textView17);
         clickhome = findViewById(R.id.textView);
+        about = findViewById(R.id.textView23);
+        share = findViewById(R.id.textView24);
+        terms = findViewById(R.id.textView25);
 
         setSupportActionBar(toolbar);
 
@@ -88,7 +92,7 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
 
-        name.setText(SharePreferenceUtils.getInstance().getString("email"));
+        name.setText(SharePreferenceUtils.getInstance().getString("phone"));
 
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -172,16 +176,42 @@ public class MainActivity2 extends AppCompatActivity {
                             fm31.popBackStack();
                         }
 
-                        /*FragmentTransaction ft31 = fm31.beginTransaction();
+                        FragmentTransaction ft31 = fm31.beginTransaction();
                         ft31.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                        NewOrder frag131 = new NewOrder();
+                        Orders frag131 = new Orders();
                         ft31.replace(R.id.replace, frag131);
                         //ft.addToBackStack(null);
                         ft31.commit();
-                        drawer.closeDrawer(GravityCompat.START);*/
+                        drawer.closeDrawer(GravityCompat.START);
                         break;
                 }
                 return true;
+            }
+        });
+
+        terms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(MainActivity2.this, Web.class);
+                intent.putExtra("title", "Terms & Conditions");
+                intent.putExtra("url", "https://mrtecks.com/grocery/terms.php");
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+
+            }
+        });
+
+        about.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(MainActivity2.this, Web.class);
+                intent.putExtra("title", "About Us");
+                intent.putExtra("url", "https://mrtecks.com/grocery/about.php");
+                startActivity(intent);
+                drawer.closeDrawer(GravityCompat.START);
+
             }
         });
 
@@ -190,6 +220,19 @@ public class MainActivity2 extends AppCompatActivity {
             public void onClick(View v) {
 
                 navigation.setSelectedItemId(R.id.action_home);
+
+            }
+        });
+
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ShareCompat.IntentBuilder.from(MainActivity2.this)
+                        .setType("text/plain")
+                        .setChooserTitle("Chooser title")
+                        .setText("http://play.google.com/store/apps/details?id=" + getPackageName())
+                        .startChooser();
 
             }
         });
