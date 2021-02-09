@@ -149,6 +149,7 @@ public interface AllApiIneterface {
             @Part("user_id") String user_id,
             @Part("amount") String amount,
             @Part("del_charges") String del_charges,
+            @Part("wallet_amount") String wallet_amount,
             @Part("txn") String txn,
             @Part("name") String name,
             @Part("address") String address,

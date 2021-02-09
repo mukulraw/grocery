@@ -95,7 +95,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (image.length() > 0)
         {
             ImageLoader loader = ImageLoader.getInstance();
-            loader.loadImage("https://mrtecks.com/grocery/admin/upload/nimage/" + image, new ImageLoadingListener() {
+            loader.loadImage("https://mrtecks.com/grocery/epickadmin/upload/nimage/" + image, new ImageLoadingListener() {
                 @Override
                 public void onLoadingStarted(String imageUri, View view) {
 

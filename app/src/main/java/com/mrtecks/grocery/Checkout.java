@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -42,7 +43,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,6 +78,11 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
     String isnew = "1";
     int del_charges = 0;
+    int wallet_amount = 0;
+    int wallet_value = 0;
+
+    CheckBox wallettitle;
+    TextView wallet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +97,8 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
         del_charges = getIntent().getIntExtra("del_charges", 0);
 
         toolbar = findViewById(R.id.toolbar4);
+        wallettitle = findViewById(R.id.wallettitle);
+        wallet = findViewById(R.id.wallet);
         delivery = findViewById(R.id.textView50);
         name = findViewById(R.id.editText2);
         address = findViewById(R.id.editText3);
@@ -126,7 +137,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
         amount.setText("₹ " + amm);
 
-        float gt = Float.parseFloat(amm) + del_charges;
+        float gt = Float.parseFloat(amm) + del_charges - wallet_amount;
 
         grand.setText("₹ " + gt);
         delivery.setText("₹ " + del_charges);
@@ -375,7 +386,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
                                 amount.setText("₹ " + amm);
 
-                                float gt = Float.parseFloat(amm) + 0;
+                                float gt = Float.parseFloat(amm) + del_charges - wallet_amount;
 
                                 grand.setText("₹ " + gt);
 
@@ -420,6 +431,31 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
             }
         });
 
+        wallettitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                {
+                    wallet_amount = wallet_value;
+                    wallet.setText("₹ " + wallet_amount);
+                    float gt = Float.parseFloat(amm) + del_charges - wallet_amount;
+
+                    grand.setText("₹ " + gt);
+
+                    gtotal = String.valueOf(gt);
+                }
+                else
+                {
+                    wallet_amount = 0;
+                    wallet.setText("₹ " + wallet_amount);
+                    float gt = Float.parseFloat(amm) + del_charges - wallet_amount;
+
+                    grand.setText("₹ " + gt);
+
+                    gtotal = String.valueOf(gt);
+                }
+            }
+        });
 
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -483,6 +519,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                                                             SharePreferenceUtils.getInstance().getString("userId"),
                                                             gtotal,
                                                             String.valueOf(del_charges),
+                                                            String.valueOf(wallet_amount),
                                                             oid,
                                                             n,
                                                             adr,
@@ -607,6 +644,13 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
             }
         });
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getRew();
     }
 
     @Override
@@ -642,6 +686,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                     SharePreferenceUtils.getInstance().getString("userId"),
                     gtotal,
                     String.valueOf(del_charges),
+                    String.valueOf(wallet_amount),
                     oid,
                     n,
                     adr,
@@ -853,4 +898,48 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
         }
 
     }
+
+    void getRew() {
+
+//        progress.setVisibility(View.VISIBLE);
+
+        Bean b = (Bean) getApplicationContext();
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.level(HttpLoggingInterceptor.Level.HEADERS);
+        logging.level(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(b.baseurl)
+                .client(client)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
+
+        Call<String> call = cr.getRew(SharePreferenceUtils.getInstance().getString("userId"));
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+                wallettitle.setText("Use Wallet - ₹ " + response.body());
+                wallet_amount = Integer.parseInt(response.body());
+                wallet_value = Integer.parseInt(response.body());
+//
+//                progress.setVisibility(View.GONE);
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+//                progress.setVisibility(View.GONE);
+            }
+        });
+
+    }
+
 }

@@ -48,7 +48,7 @@ public class MainActivity2 extends AppCompatActivity {
     ImageView cart;
     TextView count;
 
-    TextView address, orders, cart1, contact, logout, name, about, share, terms;
+    TextView address, orders, cart1, contact, logout, name, about, share, terms, rewards;
 
     ImageView clickhome;
 
@@ -71,6 +71,7 @@ public class MainActivity2 extends AppCompatActivity {
         about = findViewById(R.id.textView23);
         share = findViewById(R.id.textView24);
         terms = findViewById(R.id.textView25);
+        rewards = findViewById(R.id.rewards);
 
         setSupportActionBar(toolbar);
 
@@ -384,13 +385,13 @@ public class MainActivity2 extends AppCompatActivity {
 
         AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
 
-        Call<String> call = cr.getRew(SharePreferenceUtils.getInstance().getString("user_id"));
+        Call<String> call = cr.getRew(SharePreferenceUtils.getInstance().getString("userId"));
 
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
 
-//                rewards.setText("REWARD POINTS - " + response.body());
+                  rewards.setText("My Wallet - ₹ " + response.body());
 //
 //                progress.setVisibility(View.GONE);
 

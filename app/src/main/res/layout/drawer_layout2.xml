@@ -64,6 +64,24 @@
         app:layout_constraintTop_toBottomOf="@+id/textView17" />
 
     <TextView
+        android:id="@+id/rewards"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_book"
+        android:drawablePadding="12dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        android:text="My Wallet - ₹ 0"
+        android:textColor="#5F7D95"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView18" />
+
+
+    <TextView
         android:id="@+id/textView19"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -78,7 +96,7 @@
         android:textColor="#5F7D95"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView18" />
+        app:layout_constraintTop_toBottomOf="@+id/rewards" />
 
     <TextView
         android:id="@+id/textView20"
