@@ -224,15 +224,15 @@ public class Cart extends Fragment {
 
                 if (amm > 0) {
 
+                    Intent intent = new Intent(mainActivity, Checkout.class);
                     if (amm < 1500) {
-                        Intent intent = new Intent(mainActivity, Checkout.class);
-                        intent.putExtra("amount", String.valueOf(amm + 19));
-                        startActivity(intent);
-                    } else {
-                        Intent intent = new Intent(mainActivity, Checkout.class);
                         intent.putExtra("amount", String.valueOf(amm));
-                        startActivity(intent);
+                        intent.putExtra("del_charges", 19);
+                    } else {
+                        intent.putExtra("amount", String.valueOf(amm));
+                        intent.putExtra("del_charges", 0);
                     }
+                    startActivity(intent);
 
 
                 } else {

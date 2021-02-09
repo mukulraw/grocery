@@ -63,7 +63,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
     RadioGroup group;
     String oid;
     TextView date;
-    TextView amount , grand;
+    TextView amount , grand, delivery;
     String dd = "";
     List<String> ts;
 
@@ -73,6 +73,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
     List<Datum> adlist;
 
     String isnew = "1";
+    int del_charges = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +85,10 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
         adlist = new ArrayList<>();
 
         amm = getIntent().getStringExtra("amount");
+        del_charges = getIntent().getIntExtra("del_charges", 0);
 
         toolbar = findViewById(R.id.toolbar4);
+        delivery = findViewById(R.id.textView50);
         name = findViewById(R.id.editText2);
         address = findViewById(R.id.editText3);
         proceed = findViewById(R.id.button6);
@@ -123,9 +126,10 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
 
         amount.setText("₹ " + amm);
 
-        float gt = Float.parseFloat(amm) + 0;
+        float gt = Float.parseFloat(amm) + del_charges;
 
         grand.setText("₹ " + gt);
+        delivery.setText("₹ " + del_charges);
 
         gtotal = String.valueOf(gt);
 
@@ -478,6 +482,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
                                                     Call<checkoutBean> call = cr.buyVouchers(
                                                             SharePreferenceUtils.getInstance().getString("userId"),
                                                             gtotal,
+                                                            String.valueOf(del_charges),
                                                             oid,
                                                             n,
                                                             adr,
@@ -636,6 +641,7 @@ public class Checkout extends AppCompatActivity implements DatePickerDialog.OnDa
             Call<checkoutBean> call = cr.buyVouchers(
                     SharePreferenceUtils.getInstance().getString("userId"),
                     gtotal,
+                    String.valueOf(del_charges),
                     oid,
                     n,
                     adr,

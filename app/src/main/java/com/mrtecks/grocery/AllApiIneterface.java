@@ -148,6 +148,7 @@ public interface AllApiIneterface {
     Call<checkoutBean> buyVouchers(
             @Part("user_id") String user_id,
             @Part("amount") String amount,
+            @Part("del_charges") String del_charges,
             @Part("txn") String txn,
             @Part("name") String name,
             @Part("address") String address,
